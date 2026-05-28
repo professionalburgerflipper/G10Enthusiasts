@@ -1,6 +1,7 @@
 // Load installed libraries.
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { transit_realtime } = require('gtfs-realtime-bindings');
 
 // Allow connections to frontend
@@ -8,6 +9,8 @@ const app = express();
 app.use(cors());
 
 const routeFilter = "G10";
+
+// TODO: Update vehicle data independantly, instead of when /vehicles endpoint is accessed.
 
 // Endpoint to fetch and parse transit data.
 // Parsed GTFS data can be viewed in http://localhost:3000/vehicles when server is running.
@@ -17,12 +20,14 @@ app.get('/vehicles',
 		// Realtime feed from ADLM GTFS. 
 		const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions';
 
-		console.log(`Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
+		console.log(`[${new Date().toLocaleTimeString()}] Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
 		
 		// Fetch binary from ADLM.
 		const response = await fetch(gtfsURL_vehicle_position);
 		// Throw error if fetch failed.
-		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'`);
+		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'\n`);
+
+		console.log('Parsing data...');
 
 		// Convert response to binary buffer.
 		const arrayBuffer = await response.arrayBuffer();
@@ -52,16 +57,20 @@ app.get('/vehicles',
 						// Vehicle Trip ID
 						tripID: trip.tripId	|| 0, 
 						// ADLM Bus ID 
-						ADLMID: entity.vehicle.vehicle.id || 0
+						fleetNumber: entity.vehicle.vehicle.id || 0
+						// Something cool I've found is:
+						// 3 digit fleetNumbers denote older model busses,
+						// 4 digit 1000-1999 fleetNumbers are newer model busses,
+						// and 4 digit 5000-5999 represent electric busses.
 					}
 					return vehicle
 				}
 			);
-
-		console.log('Successfully mapped data...');
 		
 		// Display filtered vehicles.
 		res.json(vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter)));
+
+		console.log('Done!\n');
 
 	}
 	catch (err) {
@@ -71,6 +80,11 @@ app.get('/vehicles',
 	}
 );
 
+// Home page.
+app.get('/', (req, res) => res.sendFile("index.html", {root: path.join(__dirname, "../")}));
+
+// Allow for accessing scripts via URL
+app.use(express.static(path.join(__dirname, "../static")))
 
 app.listen(3000, () => console.log('Localhost active; open http://localhost:3000/vehicles to view data.'));
 
