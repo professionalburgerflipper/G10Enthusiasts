@@ -8,26 +8,23 @@ const { transit_realtime } = require('gtfs-realtime-bindings');
 const app = express();
 app.use(cors());
 
+let vehicleCache = [];
+let lastUpdatedTime = null;
+
 const routeFilter = "G10";
 
-// TODO: Update vehicle data independantly, instead of when /vehicles endpoint is accessed.
-
-// Endpoint to fetch and parse transit data.
-// Parsed GTFS data can be viewed in http://localhost:3000/vehicles when server is running.
-app.get('/vehicles',
-	async (req, res) => {
-		try {
+// Re-Fetch data from URL
+async function updateVehicleCache() {
+	try {
 		// Realtime feed from ADLM GTFS. 
 		const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions';
 
-		console.log(`[${new Date().toLocaleTimeString()}] Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
+		console.log(`[${new Date().toISOString()}] Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
 		
 		// Fetch binary from ADLM.
 		const response = await fetch(gtfsURL_vehicle_position);
 		// Throw error if fetch failed.
 		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'\n`);
-
-		console.log('Parsing data...');
 
 		// Convert response to binary buffer.
 		const arrayBuffer = await response.arrayBuffer();
@@ -51,7 +48,7 @@ app.get('/vehicles',
 						// Vehicle Longitude
 						long: position.longitude || 0,
 						// Vehicle Speed
-						speed: position.speed * 3.6 || 0,
+						speed: (position.speed * 3.6).toFixed(2) || 0,
 						// Vehicle Route ID
 						routeID: trip.routeId || 0,
 						// Vehicle Trip ID
@@ -61,22 +58,34 @@ app.get('/vehicles',
 						// Something cool I've found is:
 						// 3 digit fleetNumbers denote older model busses,
 						// 4 digit 1000-1999 fleetNumbers are newer model busses,
+						// (2000-4999 are trains...)
 						// and 4 digit 5000-5999 represent electric busses.
 					}
 					return vehicle
 				}
 			);
 		
-		// Display filtered vehicles.
-		res.json(vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter)));
+		// Set cache to new feed.
+		vehicleCache = vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter))
+		// Set last updated time of cache.
+		lastUpdatedTime = new Date().toISOString();
 
-		console.log('Done!\n');
-
+		console.log('Cache Updated!\n');
 	}
 	catch (err) {
-			console.error(err);
-			res.status(500).json({error: 'Fetch request failed - ' + err.message});
+		console.error(err);
 	}
+}
+
+updateVehicleCache(); // Initial fetch
+// Fetch every 14s
+setInterval(updateVehicleCache, 14000); 
+
+// Endpoint to fetch and parse transit data.
+// Parsed GTFS data can be viewed in http://localhost:3000/vehicles when server is running.
+app.get('/vehicles',
+	(req, res) => {
+		res.json({ lastUpdated: lastUpdatedTime, data: vehicleCache });
 	}
 );
 

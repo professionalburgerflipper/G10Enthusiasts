@@ -17,8 +17,8 @@ async function refreshVehicleData() {
 	}
 }
 
-// Update data every 12s.
-setInterval(refreshVehicleData, 12000);
+// Update data every 15s.
+setInterval(refreshVehicleData, 15000);
 
 document.addEventListener(
 	"DOMContentLoaded", () => {
