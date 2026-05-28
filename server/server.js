@@ -3,39 +3,74 @@ const express = require('express');
 const cors = require('cors');
 const { transit_realtime } = require('gtfs-realtime-bindings');
 
-// Allow connections to frontend.
+// Allow connections to frontend
 const app = express();
 app.use(cors());
+
+const routeFilter = "G10";
 
 // Endpoint to fetch and parse transit data.
 // Parsed GTFS data can be viewed in http://localhost:3000/vehicles when server is running.
 app.get('/vehicles',
 	async (req, res) => {
 		try {
-			// Realtime feed from ADLM GTFS. 
-			const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions';
-			
-			// Fetch binary from ADLM.
-			const response = await fetch(gtfsURL_vehicle_position);
-			// Throw error if fetch failed.
-			if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'`);
+		// Realtime feed from ADLM GTFS. 
+		const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions';
 
-			// Convert response to binary buffer.
-			const arrayBuffer = await response.arrayBuffer();
-			const buffer = Buffer.from(arrayBuffer);
+		console.log(`Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
+		
+		// Fetch binary from ADLM.
+		const response = await fetch(gtfsURL_vehicle_position);
+		// Throw error if fetch failed.
+		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'`);
 
-			// Decode binary to object.
-			const feed = transit_realtime.FeedMessage.decode(buffer);
+		// Convert response to binary buffer.
+		const arrayBuffer = await response.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
 
-			// Return object.
-			res.json(feed);
-		}
-		catch (err) {
+		// Decode binary to object.
+		const feed = transit_realtime.FeedMessage.decode(buffer);
+
+		const vehicles = feed.entity
+			// Filter for valid vehicle entities.
+			.filter( entity => entity.vehicle )
+			.map( entity => {
+					const position = entity.vehicle.position;
+					const trip = entity.vehicle.trip;
+
+					const vehicle = {
+						// Vehicle ID
+						id: entity.id || 0,
+						// Vehicle Latitude
+						lat: position.latitude || 0,
+						// Vehicle Longitude
+						long: position.longitude || 0,
+						// Vehicle Speed
+						speed: position.speed * 3.6 || 0,
+						// Vehicle Route ID
+						routeID: trip.routeId || 0,
+						// Vehicle Trip ID
+						tripID: trip.tripId	|| 0, 
+						// ADLM Bus ID 
+						ADLMID: entity.vehicle.vehicle.id || 0
+					}
+					return vehicle
+				}
+			);
+
+		console.log('Successfully mapped data...');
+		
+		// Display filtered vehicles.
+		res.json(vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter)));
+
+	}
+	catch (err) {
 			console.error(err);
 			res.status(500).json({error: 'Fetch request failed - ' + err.message});
-		}
+	}
 	}
 );
+
 
 app.listen(3000, () => console.log('Localhost active; open http://localhost:3000/vehicles to view data.'));
 
@@ -43,8 +78,8 @@ app.listen(3000, () => console.log('Localhost active; open http://localhost:3000
 // LOCALHOST SETUP GUIDE:
 // ==--==--==--==--==--==--==--==
 // 1. Make sure Node.js is installed on your machine
-// 2. Open Powershell (or CMD)
-// 3. Change directory to: {repoCloneDirectory}/G10Enthusiasts/server
+// 2. Open terminal
+// 3. Change directory to: {repoCloneDirectory}\G10Enthusiasts\server
 // 4. Type "node server.js" to run localhost. (A message should display if done correctly)
 // 5. go to http://localhost:3000/vehicles to view data.
 // ==--==--==--==--==--==--==--==
@@ -74,4 +109,14 @@ app.listen(3000, () => console.log('Localhost active; open http://localhost:3000
 //      |- timestamp
 //      |- vehicle (vehicle subcateorgy in vehicle category?)
 //          |- id (ADLM bus id)
-//          |- label 
+//          |- label
+
+// Though, we're returning a new entity which is simpiler but contains the data we need.
+// entity
+//  |- id
+//  |- lat
+//  |- long
+//  |- speed (converted to kp/h)
+//  |- routeID
+//  |- tripID
+//  |- ADLMID (Adelaide Metro Bus ID)
