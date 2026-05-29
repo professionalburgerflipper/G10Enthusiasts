@@ -2,7 +2,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+
 const { transit_realtime } = require('gtfs-realtime-bindings');
+
+const gc = require('./geocoding.js');
 
 // Allow connections to frontend
 const app = express();
@@ -54,19 +57,28 @@ async function updateVehicleCache() {
 						// Vehicle Trip ID
 						tripID: trip.tripId	|| 0, 
 						// ADLM Bus ID 
-						fleetNumber: entity.vehicle.vehicle.id || 0
+						fleetNumber: entity.vehicle.vehicle.id || 0,
 						// Something cool I've found is:
 						// 3 digit fleetNumbers denote older model busses,
 						// 4 digit 1000-1999 fleetNumbers are newer model busses,
 						// (2000-4999 are trains...)
 						// and 4 digit 5000-5999 represent electric busses.
+						// location: gc.getAddressFromCoords(position.latitude, position.longitude) || 0
 					}
 					return vehicle
 				}
 			);
 		
 		// Set cache to new feed.
+		filteredVehicles = vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter));
+		busCount = vehicles.length;
+
+		for (let bus = 0; bus < busCount; bus++) {
+			
+		}
+
 		vehicleCache = vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter))
+
 		// Set last updated time of cache.
 		lastUpdatedTime = new Date().toISOString();
 
@@ -88,7 +100,6 @@ app.get('/vehicles',
 		res.json({ lastUpdated: lastUpdatedTime, data: vehicleCache });
 	}
 );
-
 // Home page.
 app.get('/', (req, res) => res.sendFile("index.html", {root: path.join(__dirname, "../")}));
 
