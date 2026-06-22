@@ -2,4 +2,32 @@ body {
     background-color: pink;
     height: 100dvh;
     width: 100dvw;
+    padding:0%;
+    margin:0%;
 }
+
+#header-container {
+    background-color: #ff0cff;
+    border-bottom-left-radius: 2em;
+    border-bottom-right-radius: 2em;
+    height: min-content;
+    padding: 10px;
+    text-align: center;
+}
+
+#header-container h1 {
+    font-family: 'Courier New', Courier, monospace;
+
+}
+
+#body-content-main{
+    display: grid;
+    grid-template-columns: 0.8fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+#body-content-main > div{
+    background-color: rgb(215, 107, 208);
+    border-radius: 2em;
+}
+
