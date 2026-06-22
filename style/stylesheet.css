@@ -1,6 +1,5 @@
 body {
     background-color: pink;
-}
-#tempVehicleOutput {
-    background-color: red;
+    height: 100dvh;
+    width: 100dvw;
 }
