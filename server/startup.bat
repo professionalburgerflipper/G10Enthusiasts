@@ -1,4 +1,3 @@
 call npm install
 cls
-echo penis
-node server.js
+npm run dev
