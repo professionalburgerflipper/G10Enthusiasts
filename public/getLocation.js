@@ -57,11 +57,11 @@ async function findClosestVehicle(vehicleData) {
                 }
             }
         }
+		return [closestVehicleDist, closestVehicleFleetNumber];
 
-        console.log("Closest vehicle:", closestVehicleFleetNumber);
-        console.log("Distance:", closestVehicleDist);
     } catch (error) {
         console.error("Closest vehicle not found; Geolocation failed.", error);
+		return [-1, -1];
     }
 }
 

@@ -1,0 +1,87 @@
+@property --num {
+	syntax: "<integer>";
+	initial-value: 0;
+	inherits: false;
+}
+
+@property --distance {
+	initial-value: 0;
+	inherits: false;
+}
+
+
+@property --fleetNum {
+	syntax: "<integer>";
+	initial-value: 0;
+	inherits: false;
+}
+
+@property --fleet {
+	initial-value: 0;
+	inherits: false;
+}
+
+
+@font-face {
+    font-family: 'dotMatrix';
+    src: url('../font/DOTMBold.TTF');
+}
+
+
+#distance-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+
+	border: 1px solid #F2AF29;
+	border-radius: 5px;
+
+	box-shadow: 0 0 25px #F2AF2950;
+
+	background-color: #F2AF2915;
+
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+
+	font-family: 'dotMatrix';
+	font-size: 5em;
+	color: #F2AF29;
+}
+
+#route {
+	margin-left: 30px;
+	text-align: left;
+}
+
+#distance-counter {
+	transition: --num 5s;
+	counter-set: num var(--num);
+
+	--num: var(--distance, 0);
+}
+
+#distance-counter::after {
+	content: counter(num) "m";
+}
+
+#closest-fleet-number {
+	transition: --fleetNum 2s;
+	counter-set: fleetNum var(--fleetNum);
+
+	--fleetNum: var(--fleet, 0);
+
+	margin-right: 30px;
+	text-align: right;
+}
+
+#closest-fleet-number::after {
+	content: counter(fleetNum);
+}
+
+#distance-counter-last-updated-time {
+	font-family: monospace;
+	color: #474747;
+	margin: 5px;
+}
+
+

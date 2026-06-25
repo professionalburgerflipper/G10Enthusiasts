@@ -2,8 +2,11 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="/stylesheet.css">
-		<script src="/fetchVehicleDataFromServer.js"></script>
-		<script src="/getLocation.js"></script>
+		<link rel="stylesheet" href="/distanceCounter.css">
+
+		<script src="../fetchVehicleDataFromServer.js"></script>
+		<script src="../getLocation.js"></script>
+		<script src="../distanceCounter.js"></script>
 	</head>
 
 	<body id="tempVehicleOutput">
@@ -12,6 +15,13 @@
 				<div id="header-name-obj">
 					<h1 id="G10-name-header">the G10 Enthusiasts</h1>
 				</div>
+				<div id="distance-container">
+					<div id="route">G10</div>
+					<div id="distance-counter"></div>
+					<div id="closest-fleet-number"></div>
+				</div>
+				<div id="distance-counter-last-updated-time">Closest G10 Bus - Updated 0 seconds ago...</div>
+
 				<br>
 				<div id="option-bar">
 					<button id="page-selector"></button> <!--include as many as required-->

@@ -7,12 +7,14 @@ body {
 }
 
 #header-container {
-    background-color: #ff0cff;
+    background-color: #000000;
     border-bottom-left-radius: 2em;
     border-bottom-right-radius: 2em;
     height: min-content;
     padding: 10px;
     text-align: center;
+
+    color: #E0E0CE;
 }
 
 #header-container h1 {

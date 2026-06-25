@@ -9,10 +9,12 @@ async function refreshVehicleData() {
 	const _tempVehicleOutput = document.querySelector("#tempVehicleOutput");
 	try {
 		const response = await fetch(fetchURL);
-		if (!response.ok) throw new Error(`No response from Backend at -'${fetchURL}'`);
+		if (!response.ok) throw new Error(`No response from Backend at - '${fetchURL}'`);
 
 		cachedVehicleData = JSON.stringify(await response.json());
-		findClosestVehicle(cachedVehicleData);
+		const [closestVehicleDist, closestVehicleFleetNumber] = await findClosestVehicle(cachedVehicleData);
+
+		updateDistanceCounter(closestVehicleDist, closestVehicleFleetNumber);
 
 	} catch (error) {
 		console.error("Failed to auto-refresh vehicle data -", error);
