@@ -47,6 +47,10 @@ async function findClosestVehicle(vehicleData) {
         let closestVehicleDist = Number.POSITIVE_INFINITY;
         let closestVehicleFleetNumber = null;
 
+        if (parsedVehicleData.data == {}) {
+            return [0, 0]
+        }
+
         for (const value of Object.values(parsedVehicleData.data || {})) {
             if (value && typeof value === "object" && value.lat != null && value.long != null) {
                 const distance = findDistanceBetweenPoints(lat, long, value.lat, value.long);
