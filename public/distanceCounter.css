@@ -1,3 +1,4 @@
+/* Animation properties */
 @property --num {
 	syntax: "<integer>";
 	initial-value: 0;
@@ -21,20 +22,27 @@
 	inherits: false;
 }
 
+/* Color variables */
+:root {
+	--BusOrange: #F2AF29;
+	--ErrorRed: #f22929;
+}
 
+/* Bus font */
 @font-face {
     font-family: 'dotMatrix';
     src: url('../font/DOTMBold.TTF');
 }
 
-
+/* Main container */
 #distance-container {
+	--Color: var(--BusOrange);
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 
 	position: relative;
 
-	border: 1px solid #F2AF29;
+	border: 1px solid var(--Color);
 
 	background-color: #000000;
 	
@@ -44,14 +52,16 @@
 
 	font-family: 'dotMatrix';
 	font-size: 5em;
-	color: #F2AF29;
+	color: var(--Color);
 }
 
+/* G10!!!! */
 #route {
 	margin-left: 30px;
 	text-align: left;
 }
 
+/* Distance to closest G10 */
 #distance-counter {
 	transition: --num 5s;
 	counter-set: num var(--num);
@@ -59,10 +69,13 @@
 	--num: var(--distance, 0);
 }
 
+/* Distance to closest G10 - animates between values and appends SI */
 #distance-counter::after {
+	display: var(--after);
 	content: counter(num) "m";
 }
 
+/* Fleet number */
 #closest-fleet-number {
 	transition: --fleetNum 2s;
 	counter-set: fleetNum var(--fleetNum);
@@ -73,16 +86,22 @@
 	text-align: right;
 }
 
+/* Fleet number - animates between values */
 #closest-fleet-number::after {
+	display: var(--after);
 	content: counter(fleetNum);
 }
 
+
+/* Time since last update */
 #distance-counter-last-updated-time {
 	font-family: monospace;
 	color: #474747;
 	margin: 5px;
 }
 
+
+/* Loading throbber */
 #throbber {
 	position: absolute;
 	top: 0; left: 0; right: 0; bottom: 0;
