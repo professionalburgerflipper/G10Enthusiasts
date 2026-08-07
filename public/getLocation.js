@@ -1,16 +1,17 @@
-function getLocation() {
+function getLocation(high_acc) {
+    const timeout = high_acc ? 2000 : 5000;
     return new Promise((resolve, reject) => {
         if ("geolocation" in navigator) {
             const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                enableHighAccuracy: high_acc,
+                timeout: 5000,
+                maximumAge: 30000
             };
 
             navigator.geolocation.getCurrentPosition(
                 (position) => resolve([position.coords.latitude, position.coords.longitude]),
                 (error) => {
-                    geolocationErrorCallback(error);
+                    geolocationErrorCallback(error, high_acc);
                     reject(error);
                 },
                 options
@@ -22,7 +23,7 @@ function getLocation() {
     });
 }
 
-function geolocationErrorCallback(error) {
+function geolocationErrorCallback(error, high_acc) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
             console.error("Geolocation - User denied Geolocation");
@@ -31,7 +32,8 @@ function geolocationErrorCallback(error) {
             console.error("Geolocation - Location information unavailable");
             break;
         case error.TIMEOUT:
-            console.error("Geolocation - Location request timed out");
+            if (high_acc) console.log("Geolocation - Location request timed out; Attempting low accuracy...");
+            else console.error("Geolocation - Location request timed out");
             break;
         default:
             console.error("Geolocation - An unknown error occurred");
@@ -39,9 +41,21 @@ function geolocationErrorCallback(error) {
     }
 }
 
-async function findClosestVehicle(vehicleData) {
+async function findClosestVehicle(vehicleData, high_acc=true) {
     try {
-        const [lat, long] = await getLocation();
+
+        let [lat, long] = [null, null]
+
+        if (high_acc) {
+            try {
+                [lat, long] = await getLocation(true);
+            }
+            catch {
+                [lat, long] = await getLocation(false);
+            }
+        }
+        else [lat, long] = await getLocation(false);
+
         const parsedVehicleData = JSON.parse(vehicleData);
 
         let closestVehicleDist = Number.POSITIVE_INFINITY;
@@ -64,7 +78,7 @@ async function findClosestVehicle(vehicleData) {
 		return [closestVehicleDist, closestVehicleFleetNumber];
 
     } catch (error) {
-        console.error("Closest vehicle not found; Geolocation failed.", error);
+        console.error("Closest vehicle not found; Geolocation failed.", error || "??");
 		return [-1, -1];
     }
 }

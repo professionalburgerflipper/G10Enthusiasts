@@ -4,13 +4,13 @@ const fetchURL = './vehicles'
 let cachedVehicleData
 
 // Fetch vehicle data from server
-async function refreshVehicleData() {
+async function refreshVehicleData(high_acc=true) {
 	try {
 		const response = await fetch(fetchURL);
 		if (!response.ok) throw new Error(`No response from Backend at - '${fetchURL}'`);
 
 		cachedVehicleData = JSON.stringify(await response.json());
-		const [closestVehicleDist, closestVehicleFleetNumber] = await findClosestVehicle(cachedVehicleData);
+		const [closestVehicleDist, closestVehicleFleetNumber] = await findClosestVehicle(cachedVehicleData, false);
 
 		updateDistanceCounter(closestVehicleDist, closestVehicleFleetNumber);
 
@@ -20,10 +20,10 @@ async function refreshVehicleData() {
 }
 
 // Update data every 15s.
-setInterval(refreshVehicleData, 15000);
+setInterval(refreshVehicleData, 10000);
 
 document.addEventListener(
 	"DOMContentLoaded", () => {
-		refreshVehicleData();
+		refreshVehicleData(false);
 	}
 );
