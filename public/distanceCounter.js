@@ -13,8 +13,13 @@ document.addEventListener('DOMContentLoaded',
 
 function updateDistanceCounter(distance, fleetNumber) {
 	if (distance >= 0) {
+		const throbber = document.querySelector("#throbber");
+		throbber.style.opacity = 0;
+
+
 		distance = Math.round(distance);
 		const counter = document.querySelector("#distance-counter");
+
 		counter.style.setProperty('--distance', `${distance}`);
 
 		const fleetNumCounter = document.querySelector("#closest-fleet-number");

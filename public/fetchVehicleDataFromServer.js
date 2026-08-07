@@ -5,8 +5,6 @@ let cachedVehicleData
 
 // Fetch vehicle data from server
 async function refreshVehicleData() {
-	// Temp. To display stringified data to frontend.
-	const _tempVehicleOutput = document.querySelector("#tempVehicleOutput");
 	try {
 		const response = await fetch(fetchURL);
 		if (!response.ok) throw new Error(`No response from Backend at - '${fetchURL}'`);
