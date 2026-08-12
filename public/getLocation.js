@@ -1,3 +1,19 @@
+let geolocationCache = [null, null, null, null, null]
+
+async function initGeolocCache() {
+    geolocationCache = await getLocation(false);
+}
+
+initGeolocCache();
+
+setInterval(
+    async () => {
+        try {  geolocationCache = await getLocation(true); }
+        catch {geolocationCache = await getLocation(false);}
+    },
+    15000
+);
+
 function getLocation(high_acc) {
     return new Promise((resolve, reject) => {
         if ("geolocation" in navigator) {
@@ -11,9 +27,9 @@ function getLocation(high_acc) {
             // Get the current position using the Geolocation API
             // Resolves latitude and longitude on success
             // Rejects with a specific error on failure
-            
+
             navigator.geolocation.getCurrentPosition(
-                (position) => resolve([position.coords.latitude, position.coords.longitude, position.coords.speed, position.coords.accuracy]),
+                (position, speed) => resolve([position.coords.latitude, position.coords.longitude, speed, position.coords.accuracy, new Date()]),
                 (error) => {
                     geolocationErrorCallback(error, high_acc);
                     reject(error);
@@ -55,17 +71,7 @@ function geolocationErrorCallback(error, high_acc) {
 async function findClosestVehicle(vehicleData, high_acc=true) {
     try {
         // Default empty values to be overridden by geolocation results
-        let [lat, long, speed, acc] = [null, null, null, null]
-
-        // Attemps high accuracy geolocation first, then falls back to low accuracy if it fails
-        if (high_acc) {
-            try {   [lat, long, speed, acc] = await getLocation(true); }
-            catch { [lat, long, speed, acc] = await getLocation(false); }
-        }
-        // If high accuracy is not requested, it directly attempts low accuracy geolocation
-        else [lat, long, speed, acc] = await getLocation(false);
-
-        console.log([lat, long, speed, acc])
+        let [lat, long, speed, acc, timeStamp] = geolocationCache;
 
         // Parse the inputted vehicle data
         const parsedVehicleData = JSON.parse(vehicleData);

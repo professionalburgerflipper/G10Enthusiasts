@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="/stylesheet.css">
-		<link rel="stylesheet" href="/distanceCounter.css">
+		<link rel="manifest" href="../manifest.json">
 
-		<script src="../fetchVehicleDataFromServer.js"></script>
+		<link rel="stylesheet" href="/css/stylesheet.css">
+		<link rel="stylesheet" href="/css/distanceCounter.css">
+
+		<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+
+		<script src="../retrieveVehicleDataFromServer.js"></script>
+		<script src="../retrieveTimetableFromServer.js"></script>
 		<script src="../getLocation.js"></script>
 		<script src="../distanceCounter.js"></script>
 		<script src="../getNextStop.js"></script>
 	</head>
+
+	<!-- <script> // socket.emit('emit to server')
+		const socket = io();
+
+		socket.on('connect', () => {
+			console.log('Connected to server');
+		});
+
+	</script> -->
 
 	<body id="tempVehicleOutput">
 		<div id="meta-body-container">
@@ -24,12 +38,9 @@
 				</div>
 				<div id="distance-counter-last-updated-time">Closest G10 Bus - Updated 0 seconds ago...</div>
 
-				<img src="../media/g10.gif"
+				<img src="../media/g10.gif">
 
 				<br>
-				<div id="option-bar">
-					<button id="page-selector"></button> <!--include as many as required-->
-				</div>
 			</div>
 			<div id="body-content-main">
 				<div id="theG10-desc-box">

@@ -14,8 +14,10 @@
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
+    "csv-parser": "^3.2.1",
     "express": "^5.2.1",
     "gtfs-realtime-bindings": "^2.0.0",
-    "node-geocoder": "^4.4.1"
+    "jszip": "^3.10.1",
+    "socket.io": "^4.8.3"
   }
 }
