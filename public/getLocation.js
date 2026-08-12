@@ -2,13 +2,17 @@ let geolocationCache = [null, null, null, null, null]
 
 async function initGeolocCache() {
     geolocationCache = await getLocation(false);
+    document.getElementById("debug2").innerHTML = geolocationCache;
 }
 
 initGeolocCache();
 
 setInterval(
     async () => {
-        try {  geolocationCache = await getLocation(true); }
+        try { 
+            geolocationCache = await getLocation(true);
+            document.getElementById("debug2").innerHTML = geolocationCache;
+        }
         catch {geolocationCache = await getLocation(false);}
     },
     15000

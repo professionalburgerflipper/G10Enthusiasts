@@ -14,6 +14,8 @@
 - Next stop
 	~~- Fetch static routes and stops from GTFS (version handling as well)~~
 	- Fetch time delays if actually possible
+- Mobile styling
+	- tom this one's all yours :D
 
 ## TODO LATER
 - Chatroom
