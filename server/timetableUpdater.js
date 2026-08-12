@@ -66,7 +66,8 @@ async function updateTimetableCache() {
         const stop_ids = await trimStopTimes(trips.map(t => t.trip_id));
         await trimStops(stop_ids);
  
-		fs.rmSync(path.join(__dirname, '..', 'timetable'), { recursive: true });
+        if (fs.existsSync(path.join(__dirname, '..', 'timetable')))
+		    fs.rmSync(path.join(__dirname, '..', 'timetable'), { recursive: true });
 		fs.renameSync(path.join(__dirname, '..', 'timetable_new'), path.join(__dirname, '..', 'timetable'));
 
 		console.log(`[${new Date().toISOString()}] Timetable updated!`);
