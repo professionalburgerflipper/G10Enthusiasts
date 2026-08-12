@@ -36,6 +36,7 @@ async function updateVehicleCache() {
 		// Decode binary to object.
 		const feed = transit_realtime.FeedMessage.decode(buffer);
 
+		
 		const vehicles = feed.entity
 			// Filter for valid vehicle entities.
 			.filter( entity => entity.vehicle )
@@ -89,6 +90,15 @@ async function updateVehicleCache() {
 	}
 }
 
+async function updateTimetableCache() {
+	try {
+		const gtfsURL_timetable = "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
+	}
+	catch (err) {
+		console.log(err);
+	}
+}
+
 updateVehicleCache(); // Initial fetch
 // Fetch every 14s
 setInterval(updateVehicleCache, 14000); 
@@ -109,7 +119,7 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, '..', 'public', 'html', "index.html")); //each ',' represents a slash basically in pth.join, and dirname takes the main directory
 })
 
-app.listen(3000, () => console.log('Localhost active; open http://localhost:3000/vehicles to view data.')); //runs app
+app.listen(2119, () => console.log('Localhost active; open http://localhost:2119/vehicles to view data.')); //runs app
 
 // ==--==--==--==--==--==--==--==
 // LOCALHOST SETUP GUIDE:

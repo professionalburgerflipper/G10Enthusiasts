@@ -11,8 +11,9 @@ function getLocation(high_acc) {
             // Get the current position using the Geolocation API
             // Resolves latitude and longitude on success
             // Rejects with a specific error on failure
+            
             navigator.geolocation.getCurrentPosition(
-                (position) => resolve([position.coords.latitude, position.coords.longitude]),
+                (position) => resolve([position.coords.latitude, position.coords.longitude, position.coords.speed, position.coords.accuracy]),
                 (error) => {
                     geolocationErrorCallback(error, high_acc);
                     reject(error);
@@ -54,15 +55,17 @@ function geolocationErrorCallback(error, high_acc) {
 async function findClosestVehicle(vehicleData, high_acc=true) {
     try {
         // Default empty values to be overridden by geolocation results
-        let [lat, long] = [null, null]
+        let [lat, long, speed, acc] = [null, null, null, null]
 
         // Attemps high accuracy geolocation first, then falls back to low accuracy if it fails
         if (high_acc) {
-            try {   [lat, long] = await getLocation(true); }
-            catch { [lat, long] = await getLocation(false); }
+            try {   [lat, long, speed, acc] = await getLocation(true); }
+            catch { [lat, long, speed, acc] = await getLocation(false); }
         }
         // If high accuracy is not requested, it directly attempts low accuracy geolocation
-        else [lat, long] = await getLocation(false);
+        else [lat, long, speed, acc] = await getLocation(false);
+
+        console.log([lat, long, speed, acc])
 
         // Parse the inputted vehicle data
         const parsedVehicleData = JSON.parse(vehicleData);
@@ -72,7 +75,7 @@ async function findClosestVehicle(vehicleData, high_acc=true) {
         let closestVehicleFleetNumber = null;
 
         // Returns early if there are no vehicles in the data with a unique fleet number
-        if ((parsedVehicleData.data || []).length === 0) {
+        if ((parsedVehicleData.data || []).length === 0) { // 101% perfect implementaion. 
             console.log("No vehicle data available to find closest vehicle.");
             return [-1, "None"];
         }
