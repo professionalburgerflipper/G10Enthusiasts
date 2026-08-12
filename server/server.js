@@ -109,6 +109,10 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, '..', 'public', 'html', "index.html")); //each ',' represents a slash basically in pth.join, and dirname takes the main directory
 })
 
+app.get('/test', (req, res) => {
+	res.sendFile(path.join(__dirname, '..', 'public', 'html', "chat.html"));
+})
+
 app.listen(3000, () => console.log('Localhost active; open http://localhost:3000/vehicles to view data.')); //runs app
 
 // ==--==--==--==--==--==--==--==
