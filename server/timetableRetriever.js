@@ -5,7 +5,9 @@ const csv = require('csv-parser');  // Allow for csv operations
 let { is_first_checked } = require('./timetableUpdater.js');
 
 async function retrieveTimetableComponents() {
-    await is_first_checked;
+    while (!is_first_checked) {
+        await new Promise(resolve => setTimeout(resolve, 450));
+    }
 
     const components = {
         routes: [],
