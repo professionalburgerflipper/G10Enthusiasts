@@ -113,7 +113,7 @@ app.get('/test', (req, res) => {
 	res.sendFile(path.join(__dirname, '..', 'public', 'html', "chat.html"));
 })
 
-app.listen(3000, () => console.log('Localhost active; open http://localhost:3000/vehicles to view data.')); //runs app
+app.listen(2119, () => console.log('Localhost active; open http://localhost:2119/vehicles to view data.')); //runs app
 
 // ==--==--==--==--==--==--==--==
 // LOCALHOST SETUP GUIDE:
