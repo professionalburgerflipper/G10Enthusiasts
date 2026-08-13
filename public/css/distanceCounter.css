@@ -1,4 +1,15 @@
 /* Animation properties */
+@property --rt {
+	syntax: "<string>";
+	initial-value: "";
+	inherits: false;
+}
+
+@property --routeTarget {
+	initial-value: "";
+	inherits: false;
+}
+
 @property --num {
 	syntax: "<integer>";
 	initial-value: 0;
@@ -26,6 +37,8 @@
 :root {
 	--BusOrange: #F2AF29;
 	--ErrorRed: #f22929;
+	--ValidatedGreen: #3dcb1d;
+	--NightBlue: #1f6a95;
 }
 
 /* Bus font */
@@ -38,7 +51,11 @@
 #distance-container {
 	--Color: var(--BusOrange);
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: min-content 1fr min-content;
+	gap: 1dvw;
+	padding: 0 2dvw;
+
+	transition: --Color 2s;
 
 	border-radius: 10px;
 
@@ -53,14 +70,21 @@
 	margin-right: auto;
 
 	font-family: 'dotMatrix';
-	font-size: 5em;
+	/* font-size: 5em; */
+	font-size: 6dvw;
 	color: var(--Color);
+	text-wrap-mode: nowrap;
+
+	anchor-scope: --route, --fleet;
 }
 
 /* G10!!!! */
 #route {
-	margin-left: 30px;
+	/* margin-left: 30px; */
 	text-align: left;
+
+	transition: --rt 5s;
+	min-width: 4ch;
 }
 
 /* Distance to closest G10 */
@@ -84,8 +108,9 @@
 
 	--fleetNum: var(--fleet, 0);
 
-	margin-right: 30px;
+	/* margin-right: 30px; */
 	text-align: right;
+	min-width: 4ch;
 }
 
 /* Fleet number - animates between values */
@@ -107,6 +132,7 @@
 #throbber {
 	position: absolute;
 	top: 0; left: 0; right: 0; bottom: 0;
+	max-height: 100%;
 	border-radius: 10px;
 	background: #000000;
 	display: flex;
@@ -114,4 +140,10 @@
 	justify-content: center;
 
 	transition: 2s;
+}
+
+#throbber > img {
+	max-width: 100%;
+	max-height: 100%;
+	overflow: hidden;
 }

@@ -15,6 +15,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "csv-parser": "^3.2.1",
+    "csv-writer": "^1.6.0",
     "express": "^5.2.1",
     "gtfs-realtime-bindings": "^2.0.0",
     "jszip": "^3.10.1",

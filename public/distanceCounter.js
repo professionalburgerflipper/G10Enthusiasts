@@ -16,13 +16,42 @@ document.addEventListener('DOMContentLoaded',
 // Distance >= 0 when valid
 // Distance = -1 when no vehicles are operational or geolocation failed
 // Distance < -1 when things go bad because that should never happen
-function updateDistanceCounter(distance, fleetNumber) {
-	if (distance < -1) return;		// Return when very bad
+function updateDistanceCounter(route, distance, fleetNumber) {
+	if (distance < -1) return;		// Return when very very bad
 	const isValid = distance != -1; // Used in checks to determine color and text
 
 	// Transition loading throbber out when ready
 	const throbber = document.querySelector("#throbber");
 	throbber.style.opacity = 0;
+
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	let iterations = 0;
+
+	const routeCounter = document.querySelector("#route");
+
+	// Route count animation.
+	if (routeCounter.innerText != route && route !== null) {
+		const interval = setInterval(
+			() => {
+				routeCounter.innerText = route
+					.split("")
+					.map(
+						(letter, index) => {
+							if (index < iterations) {
+								return route[index];
+							}
+							return letters[Math.floor(Math.random() * 26)];
+						}
+					).join("");
+				
+				if (iterations >= route.length) {
+					clearInterval(interval);
+				}
+				
+				iterations += 1 / 3; 
+			},
+		100);
+	}
 
 	// Determine accurate distance
 	distance = Math.round(distance);
@@ -40,8 +69,14 @@ function updateDistanceCounter(distance, fleetNumber) {
 	// Replace counter with text when error handling / no vehicles operational
 	fleetNumCounter.textContent = isValid ? '' : fleetNumber;
 
-	// Update color of distance counter and fleet number counter based on validity
-	counter.parentNode.style.setProperty('--Color', isValid ? 'var(--BusOrange)' : 'var(--ErrorRed)');
+	// Update colour of everything based on
+	// 1. Validity
+	// 2. Distance
+	// 3. Route
+	if (!isValid) counter.parentNode.style.setProperty('--Color', 'var(--ErrorRed)');
+	else if (distance <= 75) counter.parentNode.style.setProperty('--Color', 'var(--ValidatedGreen)');
+	else if (route == 'N10') counter.parentNode.style.setProperty('--Color', 'var(--NightBlue)');
+	else counter.parentNode.style.setProperty('--Color', 'var(--BusOrange)');
 
 	// Reset last updated time (to -1 since incrementation occurs before first update)
 	lastUpdatedTime = -1;

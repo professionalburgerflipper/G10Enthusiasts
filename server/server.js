@@ -18,11 +18,12 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // The sacred
-const routeFilter = "G10";
+const routeFilters = [ "G10", "G10A", "G10B", "G10C", "N10" ];
 
 // Load G10 enthusiast modules
-const { initTimetableUpdater } = require('./timetableUpdater.js'); initTimetableUpdater();
-const { init, vehicleCache, lastUpdatedTime } = require('./vehicleCache.js'); init(routeFilter);
+const { initTimetableUpdater } = require('./timetableUpdater.js'); initTimetableUpdater(routeFilters);
+const { initTripUpdateCache } = require('./tripUpdateCache.js'); initTripUpdateCache(routeFilters);
+const { init, vehicleCache, lastUpdatedTime } = require('./vehicleCache.js'); init(routeFilters);
 const retrieveTimetableComponents = require('./timetableRetriever.js');
 let sockets = require('./sockets.js');
 
@@ -60,4 +61,4 @@ io.on('connection', async (socket) => {
 })
 
 // Start server on desired port and log
-server.listen(PORT, () => console.log(`Localhost active; open http://localhost:${PORT}/ to view the G10 enthusiasts :)`));
+server.listen(PORT, () => console.log(`Localhost active; open http://localhost:${PORT}/ to view the ${routeFilters[0]} enthusiasts :)`));

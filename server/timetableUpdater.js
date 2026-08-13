@@ -1,9 +1,11 @@
 const fs = require('fs');	    // Allow for file operations
 const path = require('path');	// Allow for path operations
 const JSZip = require('jszip');     // Allow for zip operations
-const csv = require('csv-parser');  // Allow for csv operations
+const csv = require('csv-parser');  // Allow for csv read operations
+const { createObjectCsvStringifier } = require('csv-writer'); // Allow for csv write operations
 
 let is_first_checked = false;
+let routeFilters = [];
 
 /**
  * Method to automatically check to see if the localised timetable copy
@@ -85,29 +87,46 @@ function trimRoutes() { return new Promise((resolve, reject) => {
     fs.createReadStream(path.join(__dirname, '..', 'timetable_new', 'routes.txt'))
     .pipe(csv())
     .on('data', (data) => {
-        if (data.route_id !== 'G10') return; 
+        if (!routeFilters.includes(data.route_id)) return; 
         results.push(data);
     })
     .on('end', () => {
-        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'routes.txt'), 
-        `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+        // fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'routes.txt'), 
+        // `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+
+        const header = Object.keys(results[0]).map(key => ({
+            id: key,
+            title: key
+        }));
+
+        const csvStringifier = createObjectCsvStringifier({ header });
+        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'routes.txt'), csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(results));
+        
 
         resolve();
     });
 })} 
-
+ 
 function trimTrips() { return new Promise((resolve, reject) => {
     const results = []
 
     fs.createReadStream(path.join(__dirname, '..', 'timetable_new', 'trips.txt'))
     .pipe(csv())
     .on('data', (data) => {
-        if (data.route_id !== 'G10') return; 
+        if (!routeFilters.includes(data.route_id)) return;
         results.push(data);
     })
     .on('end', () => {
-        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'trips.txt'), 
-        `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+        // fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'trips.txt'), 
+        // `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+
+        const header = Object.keys(results[0]).map(key => ({
+            id: key,
+            title: key
+        }));
+
+        const csvStringifier = createObjectCsvStringifier({ header });
+        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'trips.txt'), csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(results));
 
         resolve(results);
     });
@@ -123,8 +142,16 @@ function trimShapes(shape_ids) { return new Promise((resolve, reject) => {
         results.push(data); 
     })
     .on('end', () => {
-        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'shapes.txt'), 
-        `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+        // fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'shapes.txt'), 
+        // `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+
+        const header = Object.keys(results[0]).map(key => ({
+            id: key,
+            title: key
+        }));
+
+        const csvStringifier = createObjectCsvStringifier({ header });
+        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'shapes.txt'), csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(results));
 
         resolve();
     });
@@ -140,8 +167,16 @@ function trimStopTimes(trip_ids) { return new Promise((resolve, reject) => {
         results.push(data); 
     })
     .on('end', () => {
-        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stop_times.txt'), 
-        `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+        // fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stop_times.txt'), 
+        // `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+
+        const header = Object.keys(results[0]).map(key => ({
+            id: key,
+            title: key
+        }));
+
+        const csvStringifier = createObjectCsvStringifier({ header });
+        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stop_times.txt'), csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(results));
 
         resolve(results.map(r => r.stop_id));
     });
@@ -157,8 +192,16 @@ function trimStops(stop_ids) { return new Promise((resolve, reject) => {
         results.push(data); 
     })
     .on('end', () => {
-        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stops.txt'), 
-        `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+        // fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stops.txt'), 
+        // `${Object.keys(results[0]).join(',')}\n${results.map(r => Object.values(r).join(',')).join('\n')}`);
+
+        const header = Object.keys(results[0]).map(key => ({
+            id: key,
+            title: key
+        }));
+
+        const csvStringifier = createObjectCsvStringifier({ header });
+        fs.writeFileSync(path.join(__dirname, '..', 'timetable_new', 'stops.txt'), csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(results));
 
         resolve();
     });
@@ -169,10 +212,12 @@ function trimStops(stop_ids) { return new Promise((resolve, reject) => {
 
 
 
-function init() {
+function init(rf) {
+    routeFilters = rf;
+
     console.log(`[${new Date().toISOString()}] Starting timetable updater...`);
     updateTimetableCache();
-    // setInterval(updateTimetableCache, 3 * 60 * 60 * 1000); // Fetch every 3 hours
+    setInterval(updateTimetableCache, 3 * 60 * 60 * 1000); // Fetch every 3 hours
 }
 
 module.exports = {

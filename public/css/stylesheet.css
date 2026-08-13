@@ -33,3 +33,11 @@ body {
     border-radius: 2em;
 }
 
+
+#map {
+    width: 90dvw;
+    aspect-ratio: 10 / 3;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 2em;
+}

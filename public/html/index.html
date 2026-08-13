@@ -6,13 +6,24 @@
 		<link rel="stylesheet" href="/css/stylesheet.css">
 		<link rel="stylesheet" href="/css/distanceCounter.css">
 
-		<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+		<!-- Classes -->
+		<script src="/classes/Bus.js"></script>
+		<script src="/classes/Geoloc.js"></script>
 
+		<!-- Socket.io -->
+		<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script> 
+		<!-- MapLibre GL JS -->
+		<script src="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js"></script>
+    	<link href="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css" rel="stylesheet" />
+		<script src="https://unpkg.com/@turf/turf@^7/turf.min.js"></script>
+
+		<script src="../vehicleLocationInterpolation.js"></script>
 		<script src="../retrieveVehicleDataFromServer.js"></script>
 		<script src="../retrieveTimetableFromServer.js"></script>
 		<script src="../getLocation.js"></script>
 		<script src="../distanceCounter.js"></script>
 		<script src="../getNextStop.js"></script>
+		<script src="../mapStuff.js"></script>
 	</head>
 
 	<!-- <script> // socket.emit('emit to server')
@@ -38,10 +49,11 @@
 				</div>
 				<div id="distance-counter-last-updated-time">Closest G10 Bus - Updated 0 seconds ago...</div>
 
-				<img src="../media/g10.gif">
+				<img id="rotation" src="../media/g10.gif">
 
 				<br>
 			</div>
+			<div id="map"></div>
 			<div id="body-content-main">
 				<div id="theG10-desc-box">
 					<h2 style="text-align: center;"><u>What is this?</u></h2>

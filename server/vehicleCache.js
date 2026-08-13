@@ -51,7 +51,7 @@ let lastUpdatedTime = null;
 
 // Global variables
 let sockets = require('./sockets');
-let routeFilter = '';
+let routeFilters = [];
 
 /**
  * Method to retrieve live vehicle positions from Adelaide Metro,
@@ -112,12 +112,8 @@ async function updateVehicleCache() {
 				}
 			);
 		
-		// Set cache to new feed.
-		filteredVehicles = vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter));
-		busCount = vehicles.length;
-
-		// Store vehicles in cache
-		vehicleCache = vehicles.filter(vehicle => vehicle.routeID.startsWith(routeFilter))
+		// Filter vehicles to only those in the route filters
+		vehicleCache = vehicles.filter(vehicle => routeFilters.includes(vehicle.routeID));
 
 		// Set last updated time of cache.
 		lastUpdatedTime = new Date().toISOString();
@@ -127,7 +123,7 @@ async function updateVehicleCache() {
 
 		// Send cache to all connected sockets
 		sockets.forEach(socket => {
-			socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache });
+			socket.emit('vehicleCache', {"lastUpdated":lastUpdatedTime,"data":[{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]});
 		});
 	}
 	catch (err) {
@@ -138,7 +134,7 @@ async function updateVehicleCache() {
 
 function init(rf) {
     // Set route filter variable from server.js
-    routeFilter = rf;
+    routeFilters = rf;
 
     // Loop to call updateVehicleCache every 14s
     updateVehicleCache();
@@ -147,6 +143,7 @@ function init(rf) {
 
 module.exports = {
     init,
-    vehicleCache: () => { return vehicleCache },
+    // vehicleCache: () => { return vehicleCache },
+	vehicleCache: () => { return [{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]; },
     lastUpdatedTime: () => { return lastUpdatedTime }
 }
