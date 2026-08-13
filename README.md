@@ -4,7 +4,7 @@
 - ~~SOCKETS!!~~
 	~~socket.io, client/server ver.~~
 - Map
-	leaflet/maplibre gl js
+	leaflet/maplibre gl js   -- tom starting work on this, adding js implementation temporarily with a separate html page, so that we can either move code, or iframe in.
 - G10 boarding verification
 	new method: Interpolate and extrapolate position.
 	STILL NEED to figure out boarding verification state machine
