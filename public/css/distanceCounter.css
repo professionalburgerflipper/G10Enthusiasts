@@ -160,7 +160,5 @@
 
 #next-stop::after {
 	color:azure;
-	display: contents;
-	/* display: var(--next-stop); */
-	content: var(--next-stop)
+	content: var(--next-stop);
 }
