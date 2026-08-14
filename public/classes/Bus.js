@@ -9,6 +9,9 @@ class Bus {
 		this._shapeID = cache.timetable.trips.find(item => item.trip_id == tripID).shape_id;
         this._fleetNumber = fleetNumber;
         this._allTimestamps = [receivedTimestamp];
+
+		this._snapped = [];
+		this._distTraveled = [];
     }
 
     // Attribute Getters
@@ -29,10 +32,12 @@ class Bus {
     get route() { return cache.timetable.routes.find(r => r.route_id == this._routeID); }
     get trip() { return cache.timetable.trips.find(t => t.trip_id == this._tripID); }
 
-    setSnapped(position) { this._snapped = position; }
-    get snapped() { return this._snapped || [this._lat.at(-1), this._long.at(-1)]; }
-    setDistanceTraveled(distance) { this._distTraveled = Number(distance); }
-    get distTraveled() { return this._distTraveled || undefined; }
+    setSnapped(position) { this._snapped.push(position); this._removeStaleData(); }
+    get snapped() { return this._snapped.at(-1) || [this._lat.at(-1), this._long.at(-1)]; }
+	getSnapped(index = -1) { return this._snapped.at(index); }
+    setDistanceTraveled(distance) { this._distTraveled.push(Number(distance)); this._removeStaleData(); }
+    get distTraveled() { return this._distTraveled.at(-1) || undefined; }
+	getDistTraveled(index = -1) { return this._distTraveled.at(index); }
 
     updatePositionalData(lat, long, speed, receivedTimestamp) {
         this._lat.push(lat);
@@ -61,6 +66,8 @@ class Bus {
             this._long.shift();
             this._speed.shift();
         }
+		while (this._snapped.length > 10) this._snapped.shift();
+		while (this._distTraveled.length > 10) this._distTraveled.shift();
     }
 
 }
