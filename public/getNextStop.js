@@ -15,8 +15,8 @@ function getNextStop() {
         let cleaned_stop_t = parseInt(stop_h, 10) * 3600 + parseInt(stop_m, 10) * 60 + parseInt(stop_s, 10);
         let diff = cleaned_stop_t - totalSeconds;
         if (diff <= closest_diff && diff > 0) {
-            let closest_index = i 
-            let closest_diff = diff
+            closest_index = i 
+            closest_diff = diff
         }
     }
     console.log(closest_index) // <-- returns NaN, logic error most likely
