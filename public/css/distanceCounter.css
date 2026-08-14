@@ -155,4 +155,4 @@
 #next-stop::after {
 	color:azure;
 	content: var(--next-stop);
-}
+} /* ok that fixed it
