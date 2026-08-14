@@ -74,3 +74,27 @@ function findclosestShapePoint(distance, shape, position) {
     
     return [est_lat, est_long];
 }
+
+
+function findClosestPointOnSegment(bus_pos, shape_pos_a, shape_pos_b) {
+    const [bus_x, bus_y] = bus_pos;
+    const [a_x, a_y] = shape_pos_a;
+    const [b_x, b_y] = shape_pos_b;
+    
+    const diff_x = b_x - a_x;
+    const diff_y = b_y - a_y;
+    
+    if (diff_x == 0 || diff_y == 0) return;
+    
+    const perc = ((bus_x - a_x) * diff_x + (bus_y - a_y) * diff_y) / (diff_x * diff_x + diff_y * diff_y);
+    const percClamp = Math.max(0, Math.min(perc));
+    
+    const closest_x = a_x + percClamp * diff_x;
+    const closest_y = a_y + percClamp * diff_y;
+    
+    return [
+        closest_x,
+        closest_y,
+        percClamped
+    ];
+}
