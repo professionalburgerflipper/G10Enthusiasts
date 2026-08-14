@@ -153,8 +153,8 @@
 	overflow: hidden;
 }
 
-#next-stop {
+#next-stop::after {
 	color:azure;
-	display: var(--next-stop);
+	/* display: var(--next-stop); */
 	content: var(--next-stop);
 }
