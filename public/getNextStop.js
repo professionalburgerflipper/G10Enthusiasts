@@ -21,7 +21,8 @@ function getNextStop() {
     }
 
     const view = document.querySelector('#next-stop')
-    view.style.setProperty('--next-stop', `"${cache.closestVehicle.stops[closest_index].stop_name}"`)
+    view.style.setProperty('--next-stop', `"${cache.closestVehicle.stops[closest_index].stop_name}"`);
+    document.querySelector('#next-stop::after').textContent = cache.closestVehicle.stops[closest_index].stop_name;
 
     // console.log(closest_index) // <-- returns NaN, logic error most likely
     // return cache.closestVehicle.stops[closest_index].stop_name lol
