@@ -33,12 +33,6 @@
 	inherits: false;
 }
 
-@property --next-stop {
-	syntax: "<string>";
-	initial-value: "";
-	inherits: false;
-}
-
 /* Color variables */
 :root {
 	--BusOrange: #F2AF29;
