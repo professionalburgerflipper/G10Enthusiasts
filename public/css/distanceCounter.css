@@ -154,5 +154,7 @@
 }
 
 #next-stop {
-	content: var(--next-stop)
+	color:azure;
+	display: var(--next-stop);
+	content: var(--next-stop);
 }
