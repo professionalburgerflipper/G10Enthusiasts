@@ -13,6 +13,7 @@ function cacheUpdate() {
     if (closestVehicle === null) {
         updateDistanceCounter("G10?", -1, "None");
         loadShapeToMap();
+        getNextStop();
         return;
     }
 
@@ -25,6 +26,7 @@ function cacheUpdate() {
     // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
     loadShapeToMap(closestVehicle.shape, closestVehicle.stops);
     updateDistanceCounter(closestVehicle.routeID, closestVehicleDist, closestVehicle.fleetNumber);
+    getNextStop();
     renderVehicles();
 }
 
