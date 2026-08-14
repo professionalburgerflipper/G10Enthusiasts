@@ -29,6 +29,11 @@ class Bus {
     get route() { return cache.timetable.routes.find(r => r.route_id == this._routeID); }
     get trip() { return cache.timetable.trips.find(t => t.trip_id == this._tripID); }
 
+    setSnapped(position) { this._snapped = position; }
+    get snapped() { return this._snapped || [this._lat.at(-1), this._long.at(-1)]; }
+    setDistanceTraveled(distance) { this._distTraveled = Number(distance); }
+    get distTraveled() { return this._distTraveled || undefined; }
+
     updatePositionalData(lat, long, speed, receivedTimestamp) {
         this._lat.push(lat);
         this._long.push(long);

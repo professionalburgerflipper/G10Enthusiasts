@@ -246,3 +246,43 @@ function drawPoints(coords) {
 
     map.moveLayer('point')
 }
+
+
+function drawLine(coords) {
+    if (!map) return;
+
+    if (map.getLayer('point')) map.removeLayer('point');
+    if (map.getSource('point')) map.removeSource('point');   
+
+    const geojson = {
+        type: "FeatureCollection",
+        features: [{
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: coords.map(c => [c[1], c[0]])
+            }
+        }]
+    }
+
+    map.addSource('point', {
+        type: 'geojson',
+        data: geojson
+    });
+
+    map.addLayer({
+        id: 'point',
+        type: 'line',
+        source: 'point',
+        layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        paint: {
+            'line-color': '#ff0000',
+            'line-width': 7
+        }
+    })
+
+    map.moveLayer('point')
+}

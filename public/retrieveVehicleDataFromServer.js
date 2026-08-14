@@ -20,17 +20,7 @@ function cacheUpdate() {
 
     const bus = [closestVehicle.lat.at(-1), closestVehicle.long.at(-1), closestVehicle.timestamps.at(-1)];
 
-	if (closestVehicle.lat.length >= 2) {
-		const historicalBus = [closestVehicle.lat.at(-2), closestVehicle.long.at(-2), closestVehicle.timestamps.at(-2)];
-		const estimatedClosestVehicleDist = estimateVehicleLocation(bus, historicalBus, geolocTimestamp, closestVehicle.shape);
-
-		console.log(bus);
-		console.log(estimatedClosestVehicleDist);
-		console.log(findDistanceBetweenPoints(estimatedClosestVehicleDist[0], estimatedClosestVehicleDist[1], cache.geoloc.lat.at(-1), cache.geoloc.long.at(-1)));
-
-
-	}
-
+	findBusDistanceFromOrigin(bus, closestVehicle.shape);
     
     // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
     loadShapeToMap(closestVehicle.shape, closestVehicle.stops);
