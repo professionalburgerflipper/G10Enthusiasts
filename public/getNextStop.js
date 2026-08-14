@@ -21,8 +21,8 @@ function getNextStop() {
     }
 
     const view = document.querySelector('#next-stop')
-    view.style.setProperty('--stop-name', `${cache.closestVehicle.stops[closest_index].stop_name}`)
+    view.style.setProperty('--stop-name', `"${cache.closestVehicle.stops[closest_index].stop_name}"`)
 
     // console.log(closest_index) // <-- returns NaN, logic error most likely
-    // return cache.closestVehicle.stops[closest_index].stop_name
+    // return cache.closestVehicle.stops[closest_index].stop_name lol
 }
