@@ -34,7 +34,7 @@
 }
 
 @property --next-stop {
-	initial-value: 0;
+	initial-value: "";
 	inherits: false;
 }
 
