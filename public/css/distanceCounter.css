@@ -154,6 +154,10 @@
 	overflow: hidden;
 }
 
+#next-stop {
+	color: aquamarine;
+}
+
 #next-stop::after {
 	color:azure;
 	/* display: var(--next-stop); */
