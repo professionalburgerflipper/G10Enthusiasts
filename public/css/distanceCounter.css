@@ -156,4 +156,11 @@
 	/* color:azure; */
 	font-family: "dotMatrix";
 	content: var(--next-stop);
-} /* ok that fixed it
+} /* ok that fixed it */
+
+@media only screen and (max-width: 768px) {
+	#distance-container {
+		grid-template-columns: 1fr;
+		grid-template-rows: min-content, min-content, min-content;
+	}
+}
