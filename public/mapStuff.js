@@ -1,5 +1,6 @@
 // Global Variable
 let map;
+let doneLoading = false;
 let bg_routes_added = false;
 
 // Run on page load
@@ -15,6 +16,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         interactive: false,
     })
 
+    map.on('load', () => { doneLoading = true; });
+
     while (!map) await new Promise(resolve => setTimeout(resolve, 100));
     while (!cache.timetable) await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -25,6 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadBackgroundRoutes() {
     while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!doneLoading) await new Promise(resolve => setTimeout(resolve, 100));
     while (!cache.timetable?.routes) await new Promise(resolve => setTimeout(resolve, 100));
     while (!cache.timetable?.trips) await new Promise(resolve => setTimeout(resolve, 100));
     while (!cache.timetable?.shapes) await new Promise(resolve => setTimeout(resolve, 100));
