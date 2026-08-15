@@ -225,8 +225,6 @@ function drawPoints(coords) {
         }))
     }
 
-    console.log(geojson)
-
     map.addSource('point', {
         type: 'geojson',
         data: geojson

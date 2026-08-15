@@ -25,16 +25,6 @@ function findShapePointByDistTraveled(distance) {
 	drawPoints([[lat, long]])
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-	await new Promise(async res => {
-		while (!cache.closestVehicle)
-			await new Promise(async r => setTimeout(r, 50));
-		res();
-	})
-	for (let i = 0; i < 30; i = i + 0.1) 
-		setTimeout(() => findShapePointByDistTraveled(i), i * 300 + 1000)
-})
-
 function findBusDistanceFromOrigin(bus, shape) {
 	const [bus_lat, bus_long] = [bus[0], bus[1]];
 
