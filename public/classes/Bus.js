@@ -12,6 +12,9 @@ class Bus {
 
 		this._snapped = [];
 		this._distTraveled = [];
+
+        this.mapInterpolationTime = new Date();
+        instantiateMapVehicle(this);
     }
 
     // Attribute Getters
@@ -40,9 +43,16 @@ class Bus {
 	getDistTraveled(index = -1) { return this._distTraveled.at(index); }
 
     updatePositionalData(lat, long, speed, receivedTimestamp) {
+        this._speed.push(speed);
+
+        vehicleMoveTo(
+            this,
+            [this._long.at(-1), this._lat.at(-1)],
+            [long, lat]
+        );
+
         this._lat.push(lat);
         this._long.push(long);
-        this._speed.push(speed);
         this._allTimestamps.push(receivedTimestamp);
 
         this._removeStaleData();
@@ -71,6 +81,12 @@ class Bus {
         }
 		while (this._snapped.length > 10) this._snapped.shift();
 		while (this._distTraveled.length > 10) this._distTraveled.shift();
+    }
+
+    renderStops() {
+        const stops = this.stops;
+        const route = this.route;
+        stops.forEach(stop => renderStop(stop, route.route_color));
     }
 
 }

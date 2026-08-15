@@ -1,8 +1,10 @@
 // Global Variable
 let map;
+let bg_routes_added = false;
+let stops_added = false;
 
 // Run on page load
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     // Create the map
     map = new maplibregl.Map({
@@ -14,273 +16,383 @@ document.addEventListener("DOMContentLoaded", () => {
         // interactive: false
     })
 
-    // When map loads, start loading icon and add it
-    map.on('load', async () => {
-        const image = await map.loadImage('/media/g10.png')
-        map.addImage('g10', image.data)
-    })
+    while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!cache.timetable) await new Promise(resolve => setTimeout(resolve, 100));
+
+    loadBackgroundRoutes();
 
 });
 
 
-/**
- * Loads a route shape to map
- * 
- * @param {string} shape_id  - The ID corresponding to the shape points
- * @param {string[]} stop_ids - The IDs corresponding to the stops for the shape
- */
-function loadShapeToMap(shape, stops) {
-    // Return early if missing dependencies
+function loadBackgroundRoutes() {
     if (!map) return;
 
-    // Remove old data
-    if (map.getLayer('route-shape')) map.removeLayer('route-shape');
-    if (map.getSource('route-shape')) map.removeSource('route-shape');
-    if (map.getLayer('stops')) map.removeLayer('stops');
-    if (map.getSource('stops')) map.removeSource('stops');
-
-    if (!shape || !stops) {
-        map.flyTo({
-            center: [138.59735099075218, -34.920761823897166],
-            zoom: 9
-        })
-        return;
+    if (map.getSource("bg-routes")) {
+        map.removeLayer("bg-routes");
+        map.removeSource("bg-routes");
     }
 
-    // Find shape points
-    const coords = shape.map(s => [Number(s.shape_pt_lon), Number(s.shape_pt_lat)])
+    const routes = cache.timetable.routes;
+    const routeTrips = routes.map(r => cache.timetable.trips.find(t => t.route_id == r.route_id));
+    const routeShapes = routeTrips.map(t => cache.timetable.shapes.filter(s => s.shape_id == t.shape_id));
 
-    // Format as geojson
     const geojson = {
         type: "FeatureCollection",
-        features: [{
+        features: routeShapes.map((s, i) => ({
             type: "Feature",
             geometry: {
                 type: "LineString",
-                coordinates: coords
+                coordinates: s.map(p => [Number(p.shape_pt_lon), Number(p.shape_pt_lat)])
+            },
+            properties: {
+                color: `#${routes[i].route_color}`
             }
-        }]
+        }))
     }
 
-    // Add to map
-    map.addSource('route-shape', {
-        type: 'geojson',
+    map.addSource("bg-routes", {
+        type: "geojson",
         data: geojson
     });
-    
+
     map.addLayer({
-        id: 'route-shape',
-        type: 'line',
-        source: 'route-shape',
+        id: "bg-routes",
+        type: "line",
+        source: "bg-routes",
         layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
+            "line-join": "round",
+            "line-cap": "round"
         },
         paint: {
-            'line-color': '#F2AF29',
-            'line-width': 5
+            "line-color": ["get", "color"],
+            "line-width": 5,
+            "line-opacity": 0.4
         }
-    })
-
-
-    // Format as geojson
-    const stopsGeojson = {
-        type: "FeatureCollection",
-        features: stops.map(s => ({
-            type: "Feature",
-            properties: s,
-            geometry: {
-                type: "Point",
-                coordinates: [Number(s.stop_lon), Number(s.stop_lat)]
-            }
-        }))
-    }
-
-
-    // Add to map
-    map.addSource('stops', {
-        type: 'geojson',
-        data: stopsGeojson
     });
 
-    map.addLayer({
-        id: 'stops',
-        type: 'circle',
-        source: 'stops',
-        paint: {
-            'circle-color': '#ffffff',
-            'circle-radius': 3,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#F2AF29'
-        }
+    function fit() {
+        map.fitBounds(turf.bbox(geojson), { padding: {
+            top: 60, left: 20, right: 20, bottom: 55
+        } });
+    }
+    fit();
+
+    window.addEventListener("resize", () => {
+        setTimeout(fit, 100);
     })
 
-
-
-    // Zoom to fit shape
-    // map.fitBounds(turf.bbox(geojson), { padding: {
-    //     top: 45, left: 20, right: 20, bottom: 45
-    // } });
-
-
-    // Reorder layers to have vehicles on top
-    if (map.getLayer('vehicles')) map.moveLayer('vehicles')
-    if (map.getLayer('closest-vehicle')) map.moveLayer('closest-vehicle')
+    bg_routes_added = true;
 }
 
-function renderVehicles() {
-    // Return early if missing dependencies
-    if (!map) return;
+async function renderStop(stop, route_color) {
+    while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!bg_routes_added) await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Remove old data
-    if (map.getLayer('vehicles')) map.removeLayer('vehicles');
-    if (map.getSource('vehicles')) map.removeSource('vehicles');
-    if (map.getLayer('closest-vehicle')) map.removeLayer('closest-vehicle');
-    if (map.getSource('closest-vehicle')) map.removeSource('closest-vehicle');
-
-    // Get closest vehicle
-    const vehicles = cache.vehicles;
-    const closest = cache.closestVehicle;
-
-    // Format vehicles to geojson points
     const geojson = {
-        type: "FeatureCollection",
-        features: vehicles.filter(v => v.id != closest.id).map(v => ({
-            type: "Feature",
-            properties: {...v},
-            geometry: {
-                type: "Point",
-                coordinates: [Number(v.long.at(-1)), Number(v.lat.at(-1))]
-            }
-        }))
-    }
-
-    // Format closest vehicle to a geojson point
-    const closestGeojson = {
         type: "FeatureCollection",
         features: [{
             type: "Feature",
-            properties: {...closest},
             geometry: {
                 type: "Point",
-                coordinates: [Number(closest.long.at(-1)), Number(closest.lat.at(-1))]
+                coordinates: [Number(stop.stop_lon), Number(stop.stop_lat)]
+            },
+            properties: {
+                color: `#${route_color}`,
+                name: stop.stop_name,
+                desc: stop.stop_desc,
+                code: stop.stop_code
             }
         }]
     }
 
-    // Add both to map
-    map.addSource('vehicles', {
-        type: 'geojson',
-        data: geojson
-    });
-
-    map.addSource('closest-vehicle', {
-        type: 'geojson',
-        data: closestGeojson
-    });
-
-    map.addLayer({
-        id: 'vehicles',
-        type: 'symbol',
-        source: 'vehicles',
-        layout: {
-            'icon-image': 'g10',
-            'icon-size': 0.05,
-            'icon-allow-overlap': true
-        }
-    })
-    map.moveLayer('vehicles')
-
-    map.addLayer({
-        id: 'closest-vehicle',
-        type: 'symbol',
-        source: 'closest-vehicle',
-        layout: {
-            'icon-image': 'g10',
-            'icon-size': 0.1,
-            'icon-allow-overlap': true
-        }
-    })
-    map.moveLayer('closest-vehicle')
-
-    if (map.getLayer('point'))
-        map.moveLayer('point')
-}
-
-function drawPoints(coords) {
-    if (!map) return;
-
-    if (map.getLayer('point')) map.removeLayer('point');
-    if (map.getSource('point')) map.removeSource('point');
-
-    const geojson = {
-        type: "FeatureCollection",
-        features: coords.map(c => ({
-            type: "Feature",
-            properties: {...c},
-            geometry: {
-                type: "Point",
-                coordinates: [Number(c[1]), Number(c[0])]
-            }
-        }))
-    }
-
-    map.addSource('point', {
-        type: 'geojson',
+    map.addSource(`stop-${stop.stop_id}`, {
+        type: "geojson",
         data: geojson
     });
 
     map.addLayer({
-        id: 'point',
-        type: 'circle',
-        source: 'point',
+        id: `stop-${stop.stop_id}`,
+        type: "circle",
+        source: `stop-${stop.stop_id}`,
         paint: {
-            'circle-color': '#ffffff',
-            'circle-radius': 5,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ff0000'
+            "circle-color": "#adadad",
+            "circle-radius": 5,
+            "circle-stroke-color": ["get", "color"],
+            "circle-stroke-width": 2
         }
-    })
+    });
 
-    map.moveLayer('point')
+    let popup;
+
+    map.on('click', `stop-${stop.stop_id}`, (e) => {
+        if (popup) popup.remove();
+        popup = new maplibregl.Popup({className: 'stop-popup', anchor: 'left'})
+            .setLngLat(e.lngLat)
+            .setHTML(`
+                    <b>${stop.stop_name}</b><br>
+                    <p>${stop.stop_desc}</p>
+                `)
+            .setMaxWidth("min-content")
+            .addTo(map);
+        
+    });
+
+    map.moveLayer(`stop-${stop.stop_id}`);
+    stops_added = true;
 }
 
 
-function drawLine(coords) {
-    if (!map) return;
 
-    if (map.getLayer('point')) map.removeLayer('point');
-    if (map.getSource('point')) map.removeSource('point');   
+async function instantiateMapVehicle(vehicle) {
+    while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!bg_routes_added) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!stops_added) await new Promise(resolve => setTimeout(resolve, 100));
 
     const geojson = {
         type: "FeatureCollection",
         features: [{
             type: "Feature",
             geometry: {
-                type: "LineString",
-                coordinates: coords.map(c => [c[1], c[0]])
+                type: "Point",
+                coordinates: [Number(vehicle._long.at(-1)), Number(vehicle._lat.at(-1))]
+            },
+            properties: {
+                color: `#${vehicle.route.route_color}`,
+                short_name: vehicle.route.short_name,
+                long_name: vehicle.route.long_name,
+                desc: vehicle.route.route_desc
             }
         }]
     }
 
-    map.addSource('point', {
-        type: 'geojson',
+    map.addSource(`vehicle-${vehicle.id}`, {
+        type: "geojson",
         data: geojson
     });
 
     map.addLayer({
-        id: 'point',
-        type: 'line',
-        source: 'point',
-        layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-        },
+        id: `vehicle-${vehicle.id}`,
+        type: "circle",
+        source: `vehicle-${vehicle.id}`,
         paint: {
-            'line-color': '#ff0000',
-            'line-width': 7
+            "circle-color": ["get", "color"],
+            "circle-radius": 8,
+            "circle-stroke-color": ["get", "color"],
+            "circle-stroke-width": 2
         }
-    })
+    });
 
-    map.moveLayer('point')
+    map.moveLayer(`vehicle-${vehicle.id}`);
+}
+
+
+//! Version 1: Human-written, janky (does not use animation frames)
+// function vehicleMoveTo(vehicle, current, destination) {    
+//     if (!map) return;
+//     if (current[0] === destination[0] && current[1] === destination[1]) return;
+//     const now = new Date();
+//     vehicle.mapInterpolationTime = now;
+
+//     const shape = vehicle.shape;
+
+//     const [initClosestCoord, initDistance] = findBusDistanceFromOrigin([current[1], current[0]], shape);
+//     const [destClosestCoord, destDistance] = findBusDistanceFromOrigin([destination[1], destination[0]], shape);
+
+//     const diffDistance = Math.max(initDistance, destDistance) - Math.min(initDistance, destDistance);
+//     const distPerIncrement = 0.001; // m
+//     const timePerIncrement = 10; // ms
+
+//     console.log(`%c[${new Date().toISOString()}] Moving vehicle ${vehicle.id} from ${current} to ${destination} - ${diffDistance}m`,
+//         'background: #222; color: #bada55');
+
+//     for (let m = 0, i = 0; m < Math.ceil(diffDistance); m += Math.min(distPerIncrement, Math.ceil(diffDistance) - m), i += 1) {
+//         let real_m = m;
+//         if (m > diffDistance) real_m = diffDistance;
+//         if (initDistance > destDistance) real_m *= -1;
+
+//         const [point_lat, point_lon] = findShapePointByDistTraveled(initDistance + real_m, shape);
+//         setTimeout(() => vehicleSetTo(vehicle, [point_lon, point_lat], now), i * timePerIncrement);
+//     }
+// }
+
+
+
+//! Version 2: AI-generated, does not use vehicle speed for interpolation speed
+// function vehicleMoveTo(vehicle, current, destination) {
+//     if (!map) return;
+//     if (current[0] === destination[0] && current[1] === destination[1]) return;
+
+//     const now = new Date();
+//     vehicle.mapInterpolationTime = now;
+
+//     const shape = vehicle.shape;
+
+//     const [, initDistance] =
+//         findBusDistanceFromOrigin([current[1], current[0]], shape);
+
+//     const [, destDistance] =
+//         findBusDistanceFromOrigin([destination[1], destination[0]], shape);
+
+//     const diffDistance =
+//         Math.abs(destDistance - initDistance);
+
+//     const distPerIncrement = 0.001; // km
+//     const timePerIncrement = 10;    // ms
+
+//     console.log(
+//         `%c[${new Date().toISOString()}] Moving vehicle ${vehicle.id} from ${current} to ${destination} - ${diffDistance}km`,
+//         'background: #222; color: #bada55'
+//     );
+
+//     const direction = initDistance > destDistance ? -1 : 1;
+//     const startTime = Date.now();
+
+//     function animate() {
+//         const elapsed = Date.now() - startTime;
+
+//         const m = Math.min(
+//             Math.floor(elapsed / timePerIncrement) * distPerIncrement,
+//             diffDistance
+//         );
+
+//         const shapeDistance =
+//             initDistance + m * direction;
+
+//         const [point_lat, point_lon] =
+//             findShapePointByDistTraveled(shapeDistance, shape);
+
+//         vehicleSetTo(
+//             vehicle,
+//             [point_lon, point_lat],
+//             now
+//         );
+
+//         if (m < diffDistance) {
+//             vehicle.mapInterpolationFrame =
+//                 requestAnimationFrame(animate);
+//         } else {
+//             vehicle.mapInterpolationFrame = null;
+//         }
+//     }
+
+//     vehicle.mapInterpolationFrame =
+//         requestAnimationFrame(animate);
+// }
+
+
+
+//! Version 3: AI-generated, uses vehicle speed for interpolation speed, but I don't trust it
+function vehicleMoveTo(vehicle, current, destination) {
+    if (!map) return;
+    if (current[0] === destination[0] && current[1] === destination[1]) return;
+
+    const now = new Date();
+    vehicle.mapInterpolationTime = now;
+
+    const shape = vehicle.shape;
+
+    const [, initDistance] =
+        findBusDistanceFromOrigin([current[1], current[0]], shape);
+
+    const [, destDistance] =
+        findBusDistanceFromOrigin([destination[1], destination[0]], shape);
+
+    const diffDistance =
+        Math.abs(destDistance - initDistance);
+
+    const direction =
+        initDistance > destDistance ? -1 : 1;
+
+    const previousSpeed = Number(vehicle.speed.at(-2));
+    const currentSpeed = Number(vehicle.speed.at(-1));
+
+    console.log(
+        `%c[${new Date().toISOString()}] Moving vehicle ${vehicle.id} ` +
+        `from ${current} to ${destination} - ${diffDistance}km ` +
+        `(${previousSpeed} → ${currentSpeed} m/s)`,
+        'background: #222; color: #bada55'
+    );
+
+    if (vehicle.mapInterpolationFrame) {
+        cancelAnimationFrame(vehicle.mapInterpolationFrame);
+    }
+
+    const startTime = Date.now();
+
+    function animate() {
+        const elapsed = Date.now() - startTime;
+
+        // Interpolate between previous and current speed.
+        const progress = Math.min(elapsed / 1000, 1);
+
+        const speed =
+            previousSpeed +
+            (currentSpeed - previousSpeed) * progress;
+
+        // m/s → km/ms
+        const kmPerMs = speed / 1_000_000;
+
+        // Distance travelled since animation started.
+        const distance =
+            Math.min(
+                elapsed * kmPerMs,
+                diffDistance
+            );
+
+        const shapeDistance =
+            initDistance +
+            distance * direction;
+
+        const [point_lat, point_lon] =
+            findShapePointByDistTraveled(
+                shapeDistance,
+                shape
+            );
+
+        vehicleSetTo(
+            vehicle,
+            [point_lon, point_lat],
+            now
+        );
+
+        if (distance < diffDistance) {
+            vehicle.mapInterpolationFrame =
+                requestAnimationFrame(animate);
+        } else {
+            vehicle.mapInterpolationFrame = null;
+        }
+    }
+
+    vehicle.mapInterpolationFrame =
+        requestAnimationFrame(animate);
+}
+
+
+
+
+function vehicleSetTo(vehicle, position, now = vehicle.mapInterpolationTime) {
+    if (!map) return;
+    if (vehicle.mapInterpolationTime !== now) return;
+
+    const source = map.getSource(`vehicle-${vehicle.id}`)
+    if (!source) return;
+
+    source.setData({
+        type: "FeatureCollection",
+        features: [{
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: position
+            },
+            properties: {
+                color: `#${vehicle.route.route_color}`,
+                short_name: vehicle.route.short_name,
+                long_name: vehicle.route.long_name,
+                desc: vehicle.route.route_desc
+            }
+        }]
+    });
+
+    map.moveLayer(`vehicle-${vehicle.id}`);
 }

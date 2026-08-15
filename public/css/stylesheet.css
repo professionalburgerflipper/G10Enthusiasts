@@ -16,13 +16,14 @@ body {
 
 #header-container {
     background-color: #000000;
-    border-bottom-left-radius: 2em;
-    border-bottom-right-radius: 2em;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
     height: min-content;
     padding: 10px;
     text-align: center;
 
     color: #E0E0CE;
+    z-index: 3;
 }
 
 #header-container h1 {
@@ -38,16 +39,29 @@ body {
 
 #body-content-main > div{
     background-color: rgb(215, 107, 208);
-    border-radius: 2em;
+    border-radius: 2rem;
 }
 
 
 #map {
-    width: 90dvw;
-    aspect-ratio: 10 / 3;
+    width: 100dvw;
+    aspect-ratio: 2;
     margin-left: auto;
     margin-right: auto;
-    border-radius: 2em;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    margin-top: -2rem;
+    z-index: 1;
+}
+
+.stop-popup { text-wrap-mode: nowrap; color: white; }
+.stop-popup * { margin: 0; }
+.stop-popup .maplibregl-popup-close-button { display: none; }
+.stop-popup .maplibregl-popup-content { 
+    background-color: rgb(30, 30, 30); 
+    /* border: 1px solid var(--BusOrange); */
+    box-shadow: 0 0 .4rem var(--BusOrange);
+    border-radius: 1rem;
 }
 
 #next-stop {
@@ -66,7 +80,6 @@ body {
         width: 100dvw;
         overflow-x: hidden;
     }
-    #rotation {
-        width: 100dvw;
-    }
+    #rotation { width: 100dvw; }
+    #map { aspect-ratio: 1; }
 }

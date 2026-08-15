@@ -1,9 +1,24 @@
 const cache = {
     vehicles: [],
-    closestVehicle: null,
-	geoloc: null,
 	timetable: null,
-    tripUpdate: null
+    tripUpdate: null,
+	geoloc: null,
+    
+    
+    _closestVehicle: null,
+    get closestVehicle() { return this._closestVehicle; },
+    set closestVehicle(vehicle) { 
+        if (vehicle === this._closestVehicle) return;
+        if (!vehicle instanceof Bus && vehicle !== null) {
+            console.error("Vehicle must be an instance of Bus or null");
+            alert("Vehicle must be an instance of Bus or null");
+            return;
+        }
+        console.log(`%c[${new Date().toISOString()}] New closest vehicle: ${vehicle.routeID} #${vehicle.fleetNumber}`, "color: #9dff84");
+        this._closestVehicle = vehicle; 
+        if (!vehicle) return;
+        vehicle.renderStops()
+    }
 }
 
 function cacheUpdate() {
@@ -15,7 +30,6 @@ function cacheUpdate() {
     const [closestVehicle, closestVehicleDist] = findClosestVehicle();
     if (closestVehicle === null) {
         updateDistanceCounter("G10?", -1, "None");
-        loadShapeToMap();
         getNextStop();
         return;
     }
@@ -24,13 +38,11 @@ function cacheUpdate() {
 
     const bus = [closestVehicle.lat.at(-1), closestVehicle.long.at(-1), closestVehicle.timestamps.at(-1)];
 
-	findBusDistanceFromOrigin(bus, closestVehicle.shape);
+	findClosestBusDistanceFromOrigin(bus, closestVehicle.shape);
     
     // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
-    loadShapeToMap(closestVehicle.shape, closestVehicle.stops);
     updateDistanceCounter(closestVehicle.routeID, closestVehicleDist, closestVehicle.fleetNumber);
     getNextStop();
-    renderVehicles();
 }
 
 const socket = io();

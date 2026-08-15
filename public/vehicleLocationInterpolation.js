@@ -1,18 +1,22 @@
-function findShapePointByDistTraveled(distance) {
+function findShapePointByDistTraveled(distance, shape = cache.closestVehicle.shape) {
 	let closestShape = null;
 	let closestShapeNext = null;
-
-	const shape = cache.closestVehicle.shape;
 
 	for (let i = 0; i < (Object.values(shape).length - 1); i++) {
 		const shape_dist_traveled = Number(shape[i].shape_dist_traveled);
 		const next_shape_dist_traveled = Number(shape[i+1].shape_dist_traveled);
 
-		if (shape_dist_traveled < distance && distance < next_shape_dist_traveled) {
+		if (shape_dist_traveled <= distance && distance <= next_shape_dist_traveled) {
 			closestShape = shape[i];
 			closestShapeNext = shape[i+1];
 		}
 	}
+
+	if (!closestShape || !closestShapeNext) {
+		// console.error(`No closest shape found for distance ${distance}`);
+		return [0, 0];
+	}
+
 	const perc = (distance - Number(closestShape.shape_dist_traveled)) / (Number(closestShapeNext.shape_dist_traveled) - Number(closestShape.shape_dist_traveled));
 	const lat =
 		Number(closestShape.shape_pt_lat)
@@ -22,12 +26,18 @@ function findShapePointByDistTraveled(distance) {
 		Number(closestShape.shape_pt_lon)
 		+ perc * (Number(closestShapeNext.shape_pt_lon) - Number(closestShape.shape_pt_lon));
 
-	drawPoints([[lat, long]])
+	return [lat, long];
+}
+
+function findClosestBusDistanceFromOrigin(bus, shape) {
+	const [closestCoord, distance] = findBusDistanceFromOrigin(bus, shape);
+
+	cache.closestVehicle.setSnapped(closestCoord);
+    cache.closestVehicle.setDistanceTraveled(distance);
 }
 
 function findBusDistanceFromOrigin(bus, shape) {
 	const [bus_lat, bus_long] = [bus[0], bus[1]];
-
 
 	let closestShape = null;
 	let closestShapeNext = null;
@@ -63,19 +73,7 @@ function findBusDistanceFromOrigin(bus, shape) {
 		Number(closestShape.shape_dist_traveled)
 		+ toNextShapePercentage * (Number(closestShapeNext.shape_dist_traveled) - Number(closestShape.shape_dist_traveled));
 
-	// const snappedLat =
-	// 	Number(closestShape.shape_pt_lat)
-	// 	+ toNextShapePercentage * (Number(closestShapeNext.shape_pt_lat) - Number(closestShape.shape_pt_lat));
-	
-	// const snappedLong =
-	// 	Number(closestShape.shape_pt_lon)
-	// 	+ toNextShapePercentage * (Number(closestShapeNext.shape_pt_lon) - Number(closestShape.shape_pt_lon));
-
-	console.log(`shapeDist: ${closestShape.shape_dist_traveled}, nShapeDist: ${closestShapeNext.shape_dist_traveled}`);
-	console.log(`Distance trsetSnapped(closestCoord);avelled along route: ${distance}`);
-
-    cache.closestVehicle.setSnapped(closestCoord);
-    cache.closestVehicle.setDistanceTraveled(distance);
+	return [closestCoord, distance];
 }
 
 
