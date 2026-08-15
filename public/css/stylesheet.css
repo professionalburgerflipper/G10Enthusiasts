@@ -46,3 +46,9 @@ body {
     font-family: 'Courier New', 'Courier New', Courier, monospace
 }
 
+@media only screen and (max-width: 768px) {
+    #header-container {
+        width: 1fr;
+        overflow-x: hidden;
+    }
+}
