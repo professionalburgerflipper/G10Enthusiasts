@@ -126,8 +126,8 @@ async function updateVehicleCache() {
 
 		// Send cache to all connected sockets
 		sockets.forEach(socket => {
-			socket.emit('vehicleCache', {"lastUpdated":lastUpdatedTime,"data":[{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]});
-			// socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache })
+			// socket.emit('vehicleCache', {"lastUpdated":lastUpdatedTime,"data":[{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]});
+			socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache })
 		});
 	}
 	catch (err) {
@@ -147,7 +147,7 @@ function init(rf) {
 
 module.exports = {
     init,
-    // vehicleCache: () => { return vehicleCache },
-	vehicleCache: () => { return [{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]; },
+    vehicleCache: () => { return vehicleCache },
+	// vehicleCache: () => { return [{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]; },
     lastUpdatedTimeVC: () => { return lastUpdatedTime }
 }
