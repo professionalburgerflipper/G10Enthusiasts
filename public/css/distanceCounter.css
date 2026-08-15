@@ -154,5 +154,6 @@
 
 #next-stop::after {
 	/* color:azure; */
+	font-family: "dotMatrix";
 	content: var(--next-stop);
 } /* ok that fixed it
