@@ -8,6 +8,7 @@ const path = require('path');	// Allow for accessing file paths
 const express = require('express');	// the main server lol
 const http = require('http');	// Allow for combining express & socket.io
 const { Server } = require('socket.io');	// Allow for socket connections
+const fs = require('fs');		// Allow for file operations
 
 // Initialise server
 const app = express();
@@ -32,6 +33,11 @@ app.use(express.static(path.join(__dirname, '..', 'public'))) //allow and defaul
 
 // Index page
 app.get('/', (req, res) => {
+	const prerequisites = ["timetable", "timetable/routes.txt", "timetable/shapes.txt", 
+		"timetable/stop_times.txt", "timetable/stops.txt", "timetable/trips.txt"];
+	for (const p of prerequisites) 
+		if (!fs.existsSync(path.join(__dirname, '..', 'timetable', p)))
+			return res.status(425).send('Still loading server dependencies on first load. Please try again in a minute.');
 	res.sendFile(path.join(__dirname, '..', 'public', 'html', "index.html")); //each ',' represents a slash basically in pth.join, and dirname takes the main directory
 })
 
