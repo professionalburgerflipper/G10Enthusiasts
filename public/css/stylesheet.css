@@ -1,9 +1,17 @@
+html {
+    overflow-x: hidden;
+}
+
 body {
+    overflow-x:hidden;
     background-color: #F2AF2915;
     height: 100dvh;
     width: 100dvw;
     padding:0%;
     margin:0%;
+}
+#G10-name-header {
+    border-bottom: #E0E0CE 1px solid;
 }
 
 #header-container {
@@ -52,7 +60,13 @@ body {
         width: 100dvw;
     }
     #header-container {
-        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        
+        width: 100dvw;
         overflow-x: hidden;
+    }
+    #rotation {
+        width: 100dvw;
     }
 }
