@@ -52,11 +52,15 @@ class Bus {
         const now = new Date();
         const latestTimestamp = this._allTimestamps.at(-1);
 
-        const durationSinceLast = new Date(latestTimestamp) - now;
-        if (durationSinceLast > 120000) {                           // if older than 2 minutes
-            cache.vehicles.splice(cache.vehicles.indexOf(this), 1); // kys
-        }                                                           // period
+        const vehicleIndex = cache.vehicles.indexOf(this);
+        if (vehicleIndex === -1) return;
+
+        const durationSinceLast = now - new Date(latestTimestamp);
+        if (durationSinceLast > 1000 * 60 * 5) {    // if older than 5 minutes
+            cache.vehicles.splice(vehicleIndex, 1); // kys
+        }                                           // period
     }
+
 
     _removeStaleData() {
         while (this._allTimestamps.length > 10) {
