@@ -14,7 +14,7 @@ function getNextStop() {
         let [stop_h, stop_m, stop_s] = stop_time[i].arrival_time.split(":");
         let cleaned_stop_t = parseInt(stop_h, 10) * 3600 + parseInt(stop_m, 10) * 60 + parseInt(stop_s, 10);
         let diff = cleaned_stop_t - totalSeconds;
-        if (diff <= closest_diff && diff > 0) {
+        if (diff < closest_diff && diff > 0) {
             closest_index = i 
             closest_diff = diff
         }
