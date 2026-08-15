@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded',
 		const lastUpdatedElement = document.querySelector("#distance-counter-last-updated-time");
 		setInterval(() => {
 			lastUpdatedTime += 1;
-			lastUpdatedElement.innerHTML = `Closest G10 Bus - Updated ${lastUpdatedTime} seconds ago...`;
+			lastUpdatedElement.innerHTML = `Closest ${cache.mainRoute} Bus - Updated ${lastUpdatedTime} seconds ago...`;
 		}, 1000);
 	}
 );

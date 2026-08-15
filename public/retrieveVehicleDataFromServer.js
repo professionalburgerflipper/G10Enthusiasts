@@ -3,6 +3,7 @@ const cache = {
 	timetable: null,
     tripUpdate: null,
 	geoloc: null,
+    mainRoute: 'G10',
     
     
     _closestVehicle: null,
@@ -15,8 +16,18 @@ const cache = {
             return;
         }
         console.log(`%c[${new Date().toISOString()}] New closest vehicle: ${vehicle.routeID} #${vehicle.fleetNumber}`, "color: #9dff84");
+        
+        this._closestVehicle?.unrenderStops();
+        this._closestVehicle?.makeNotProminent();
         this._closestVehicle = vehicle; 
+        
         if (!vehicle) return;
+
+        this._lineFirstStopsLater(vehicle);
+    },
+
+    async _lineFirstStopsLater(vehicle) {
+        await vehicle.makeProminent();
         vehicle.renderStops()
     }
 }
@@ -25,11 +36,13 @@ function cacheUpdate() {
     if (!cache.geoloc) return;
     if (!cache.vehicles) return;
 
+    cache.mainRoute = `${cache.timetable?.routes[0]?.route_id || 'G10'}`
+
     for (const vehicle of cache.vehicles) vehicle.checkOld();
 
     const [closestVehicle, closestVehicleDist] = findClosestVehicle();
     if (closestVehicle === null) {
-        updateDistanceCounter("G10?", -1, "None");
+        updateDistanceCounter(`${cache.mainRoute}?`, -1, "None");
         getNextStop();
         return;
     }
@@ -37,11 +50,22 @@ function cacheUpdate() {
 	const geolocTimestamp = cache.geoloc.timestamps.at(-1);
 
     const bus = [closestVehicle.lat.at(-1), closestVehicle.long.at(-1), closestVehicle.timestamps.at(-1)];
+    
+    let prevBus = null;
+    if (closestVehicle.timestamps.at(-2) !== undefined) {
+        prevBus = [closestVehicle.lat.at(-2), closestVehicle.long.at(-2), closestVehicle.timestamps.at(-2)];
+    }
+
+    const estPosition = estimatePosition(bus, prevBus, geolocTimestamp, closestVehicle.shape);
+    const estDistance = findDistanceBetweenPoints(estPosition[0], estPosition[1], cache.geoloc.lat.at(-1), cache.geoloc.long.at(-1));
 
 	findClosestBusDistanceFromOrigin(bus, closestVehicle.shape);
     
     // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
-    updateDistanceCounter(closestVehicle.routeID, closestVehicleDist, closestVehicle.fleetNumber);
+    updateDistanceCounter(closestVehicle.routeID, estDistance, closestVehicle.fleetNumber);
+
+    updateBoardStatus(estDistance);
+
     getNextStop();
 }
 
@@ -57,16 +81,18 @@ socket.on(
 		cache.vehicle = JSON.stringify(data);
         for (const vehicle of data.data) {
             const bus = cache.vehicles.find(v => v.id === vehicle.id)
-            if (bus) bus.updatePositionalData(vehicle.lat, vehicle.long, vehicle.speed, data.lastUpdated);
+            if (bus) bus.updatePositionalData(vehicle.lat, vehicle.long, vehicle.speed, vehicle.bearing, data.lastUpdated);
             else {
                 const newBus = new Bus(
                     vehicle.id,
                     vehicle.lat,
                     vehicle.long,
                     vehicle.speed,
+                    vehicle.bearing,
                     vehicle.routeID,
                     vehicle.tripID,
                     vehicle.fleetNumber,
+
                     data.lastUpdated
                 )
                 cache.vehicles.push(newBus);

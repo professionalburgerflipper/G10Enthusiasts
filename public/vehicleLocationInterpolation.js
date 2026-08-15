@@ -1,3 +1,35 @@
+/**
+ * 
+ * @param {*} bus 
+ * @param {*} prevBus 
+ * @param {*} geolocTimestamp 
+ * @param {*} shape 
+ * @returns 
+ */
+function estimatePosition(bus, prevBus, geolocTimestamp = new Date(), shape = cache.closestVehicle.shape) {
+	const [bus_lat, bus_long, bus_t] = [bus[0], bus[1], new Date(bus[2])];
+
+	if (prevBus === null) return [bus_lat, bus_long];
+
+	const [p_bus_lat, p_bus_long, p_bus_t] = [prevBus[0], prevBus[1], new Date(prevBus[2])];
+
+	const bus_distance = findBusDistanceFromOrigin(bus, shape)[1];
+	const p_bus_distance = findBusDistanceFromOrigin(prevBus, shape)[1];
+
+	let est_distance = null;
+	if (p_bus_t < geolocTimestamp && geolocTimestamp < bus_t) {
+		const t = (geolocTimestamp - p_bus_t) / (bus_t - p_bus_t);
+		est_distance = p_bus_distance + t * (bus_distance - p_bus_distance);
+	}
+	else {
+		const t = geolocTimestamp - bus_t ;
+		const est_velocity = (bus_distance - p_bus_distance) / (bus_t - p_bus_t);
+		est_distance = bus_distance + (est_velocity * t);
+	}
+
+	return findShapePointByDistTraveled(est_distance);
+}
+
 function findShapePointByDistTraveled(distance, shape = cache.closestVehicle.shape) {
 	let closestShape = null;
 	let closestShapeNext = null;

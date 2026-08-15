@@ -1,9 +1,10 @@
 class Bus {
-    constructor(id, lat, long, speed, routeID, tripID, fleetNumber, receivedTimestamp) {
+    constructor(id, lat, long, speed, bearing, routeID, tripID, fleetNumber, receivedTimestamp) {
         this._id = id
         this._lat = [lat];
         this._long = [long];
         this._speed = [speed];
+        this._bearing = [bearing];
         this._routeID = routeID;
         this._tripID = tripID;
 		this._shapeID = cache.timetable.trips.find(item => item.trip_id == tripID).shape_id;
@@ -22,6 +23,7 @@ class Bus {
     get lat() { return this._lat; }
     get long() { return this._long; }
     get speed() { return this._speed; }
+    get bearing() { return this._bearing; }
     get routeID() { return this._routeID; }
     get tripID() { return this._tripID; }
     get shapeID() { return this._shapeID; }
@@ -42,8 +44,9 @@ class Bus {
     get distTraveled() { return this._distTraveled.at(-1) || undefined; }
 	getDistTraveled(index = -1) { return this._distTraveled.at(index); }
 
-    updatePositionalData(lat, long, speed, receivedTimestamp) {
+    updatePositionalData(lat, long, speed, bearing, receivedTimestamp) {
         this._speed.push(speed);
+        this._bearing.push(bearing);
 
         vehicleMoveTo(
             this,
@@ -67,6 +70,7 @@ class Bus {
 
         const durationSinceLast = now - new Date(latestTimestamp);
         if (durationSinceLast > 1000 * 60 * 5) {    // if older than 5 minutes
+            unrenderVehicle(this);
             cache.vehicles.splice(vehicleIndex, 1); // kys
         }                                           // period
     }
@@ -88,5 +92,9 @@ class Bus {
         const route = this.route;
         stops.forEach(stop => renderStop(stop, route.route_color));
     }
+    unrenderStops() { this.stops.forEach(stop => unrenderStop(stop.stop_id)); }
+
+    async makeProminent() { return await makeProminent(this); }
+    async makeNotProminent() { return await makeNotProminent(this) }
 
 }

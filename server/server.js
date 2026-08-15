@@ -19,7 +19,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // The sacred
-const routeFilters = [ "G10", "G10A", "G10B", "G10C", "N10" ];
+const routeFilters = ["G10", "G10A", "G10B", "G10C", "N10"];
+
 
 // Load G10 enthusiast modules
 const { initTimetableUpdater } = require('./timetableUpdater.js'); initTimetableUpdater(routeFilters);

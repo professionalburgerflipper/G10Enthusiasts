@@ -23,6 +23,7 @@ body {
     text-align: center;
 
     color: #E0E0CE;
+    position: relative;
     z-index: 3;
 }
 
@@ -42,10 +43,19 @@ body {
     border-radius: 2rem;
 }
 
+#rotation {
+    aspect-ratio: 400/256;
+    /* width: 20dvw;    */
+    position: absolute;
+    margin-top: -200px;
+    left: 50%;
+    translate: -50% 0;
+}
+
 
 #map {
     width: 100dvw;
-    aspect-ratio: 2;
+    aspect-ratio: 2.25;
     margin-left: auto;
     margin-right: auto;
     border-bottom-left-radius: 2rem;
@@ -54,19 +64,27 @@ body {
     z-index: 1;
 }
 
-.stop-popup { text-wrap-mode: nowrap; color: white; }
-.stop-popup * { margin: 0; }
-.stop-popup .maplibregl-popup-close-button { display: none; }
-.stop-popup .maplibregl-popup-content { 
-    background-color: rgb(30, 30, 30); 
-    /* border: 1px solid var(--BusOrange); */
-    box-shadow: 0 0 .4rem var(--BusOrange);
-    border-radius: 1rem;
+#fade {
+    width: 100dvw;
+    height: 1dvh;
+    position: relative;
+    background-color: black;
+    z-index: 2;
+    box-shadow: 0px 0px 40px 50px rgba(0, 0, 0, 1);
 }
 
-#next-stop {
-    font-family: 'Courier New', 'Courier New', Courier, monospace
+.stop-popup, .vehicle-popup { text-wrap-mode: nowrap; color: rgb(200, 200, 200); font-family: 'Courier New', Courier, monospace; font-weight: bold;}
+.stop-popup b, .vehicle-popup b { font-family: 'dotMatrix'; color: var(--BusOrange); font-size: large; }
+.stop-popup *, .vehicle-popup * { margin: 0; }
+.stop-popup .maplibregl-popup-close-button, .vehicle-popup .maplibregl-popup-close-button { display: none; }
+.stop-popup .maplibregl-popup-content, .vehicle-popup .maplibregl-popup-content {
+    background-color: rgb(30, 30, 30); 
+    border: 1px solid var(--BusOrange);
+    box-shadow: 0 0 0.3rem var(--BusOrange);
+    border-radius: 1rem;
 }
+.stop-popup .maplibregl-popup-tip, .vehicle-popup .maplibregl-popup-tip { border-bottom-color: var(--BusOrange) !important;  }
+.stop-popup i, .vehicle-popup i { font-size: x-small; opacity: .7 }
 
 @media only screen and (max-width: 768px) {
     body {

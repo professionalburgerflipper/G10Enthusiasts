@@ -52,8 +52,10 @@
 	--Color: var(--BusOrange);
 	display: grid;
 	grid-template-columns: min-content 1fr min-content;
+	grid-template-rows: 1;
 	gap: 1dvw;
 	padding: 0 2dvw;
+	padding-bottom: 0.3dvw;
 
 	transition: --Color 2s;
 
@@ -66,6 +68,7 @@
 	background-color: #000000;
 	
 	width: 80%;
+	height: min-content;
 	margin-left: auto;
 	margin-right: auto;
 
@@ -125,6 +128,10 @@
 	font-family: monospace;
 	color: #474747;
 	margin: 5px;
+	margin-top: -1.2lh;
+	position: relative;
+	z-index: 5;
+	font-size: 1dvw;
 }
 
 
@@ -148,8 +155,23 @@
 	overflow: hidden;
 }
 
-#next-stop {
+#boarded-status {
+	font-family: 'Courier New', Courier, monospace;
 	color: var(--BusOrange);
+	margin: 2%;
+}
+
+#boarded-status::after {
+	font-family: "dotMatrix";
+	content: var(--boarded-status);
+	color: var(--boarded-col, red) !important;
+}
+
+#next-stop {
+	font-family: 'Courier New', 'Courier New', Courier, monospace;
+	color: var(--BusOrange);
+	margin-bottom: 155px;
+	margin-top: 1%;
 }
 
 #next-stop::after {

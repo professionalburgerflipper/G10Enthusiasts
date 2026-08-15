@@ -32,3 +32,36 @@ function getNextStop() {
         console.log(`Error in getNextStop: ${error}`);
     }
 }
+
+function getNextStopAtStop(stop) {
+    if (typeof stop == "number") stop = cache.timetable.stops.find(s => s.stop_id == stop);
+
+    // Get relevant comparison dates
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    console.log(now, midnight)
+
+    // Get relevant stop times
+    const stop_times = cache.timetable.stop_times.filter(st => st.stop_id == stop.stop_id);
+
+    // Convet stop times to times and sort by earliest to latest
+    const stop_times_times = stop_times.map(st => {
+        const [hours, minutes, seconds] = st.arrival_time.split(':');
+        
+        const date = new Date(midnight);
+        date.setHours(hours, minutes, seconds, 0);
+
+        return [date, st.trip_id];
+    }).sort((a, b) => a[0] - b[0]);
+
+    console.log(stop_times_times)
+
+    // Calculate next in day
+    const closest = stop_times_times.find(st => st[0] > now);
+
+    console.log(closest)
+
+    // Return either the next today or the earliest tomorrow
+    return closest ? closest : stop_times_times[0];
+}

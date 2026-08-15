@@ -8,24 +8,25 @@
 		<link rel="stylesheet" href="/css/distanceCounter.css">
 
 		<!-- Classes -->
-		<script src="/classes/Bus.js"></script>
-		<script src="/classes/Geoloc.js"></script>
+		<script src="/classes/Bus.js" defer></script>
+		<script src="/classes/Geoloc.js" defer></script>
 
 		<!-- Socket.io -->
 		<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script> 
-		<!-- MapLibre GL JS -->
-		<script src="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.js"></script>
-    	<link href="https://unpkg.com/maplibre-gl@^5.14.0/dist/maplibre-gl.css" rel="stylesheet" />
+
+		<!-- Map stuff -->		
+    	<link href="https://unpkg.com/maplibre-gl@6.0.0/dist/maplibre-gl.css" rel="stylesheet" />
 		<script src="https://unpkg.com/@turf/turf@^7/turf.min.js"></script>
 
-		<script src="../vehicleLocationInterpolation.js"></script>
-		<script src="../retrieveVehicleDataFromServer.js"></script>
-		<script src="../retrieveTimetableFromServer.js"></script>
-		<script src="../retrieveTripUpdateDataFromServer.js"></script>
-		<script src="../getLocation.js"></script>
-		<script src="../distanceCounter.js"></script>
-		<script src="../getNextStop.js"></script>
-		<script src="../mapStuff.js"></script>
+		<script src="../vehicleLocationInterpolation.js" defer></script>
+		<script src="../retrieveVehicleDataFromServer.js" defer></script>
+		<script src="../retrieveTimetableFromServer.js" defer></script>
+		<script src="../retrieveTripUpdateDataFromServer.js" defer></script>
+		<script src="../getLocation.js" defer></script>
+		<script src="../distanceCounter.js" defer></script>
+		<script src="../getNextStop.js" defer></script>
+		<script src="../boardedStatus.js" defer></script>
+		<script src="../mapStuff.js" defer></script>
 	</head>
 
 	<!-- <script> // socket.emit('emit to server')
@@ -40,9 +41,10 @@
 	<body id="tempVehicleOutput">
 		<div id="meta-body-container">
 			<div id="header-container">
-				<div id="header-name-obj">
+				<!-- <div id="header-name-obj">
 					<h1 id="G10-name-header">the G10 Enthusiasts</h1>
-				</div>
+				</div> -->
+				<div id="boarded-status">boarded status: </div>
 				<div id="distance-container">
 					<div id="route">G10</div>
 					<div id="distance-counter"></div>
@@ -57,18 +59,15 @@
 				<br>
 			</div>
 			<div id="map"></div>
-			<div id="body-content-main">
-				<div id="theG10-desc-box">
-					<h2 style="text-align: center;"><u>What is this?</u></h2>
-					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-				</div>
-				<div id="avaliable-room-container">
-					<div id="room-box"><button>test</button></div>
-				</div>
-			<button>pingus</button>	
-			</div>
+			<div id="fade"></div>
+			<img src="../media/book.gif">
 		</div>
 		<p id="debug"></p>
 		<p id="debug2"></p>
+
+		<script type="module">
+			import * as maplibregl from "https://unpkg.com/maplibre-gl@^6.0.0/dist/maplibre-gl.mjs";
+			globalThis.maplibregl = maplibregl;
+		</script>
 	</body>
 </html>
