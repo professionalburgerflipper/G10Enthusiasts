@@ -149,10 +149,10 @@
 }
 
 #next-stop {
-	color: aquamarine;
+	color: var(--BusOrange);
 }
 
 #next-stop::after {
-	color:azure;
+	/* color:azure; */
 	content: var(--next-stop);
 } /* ok that fixed it

@@ -41,3 +41,7 @@ body {
     margin-right: auto;
     border-radius: 2em;
 }
+
+#next-stop {
+    font-family: 'Courier New', 'Courier New', Courier, monospace
+}
