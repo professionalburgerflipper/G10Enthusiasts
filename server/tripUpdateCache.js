@@ -35,71 +35,19 @@ async function updateTripUpdateCache() {
 		// Decode binary to object.
 		const feed = transit_realtime.FeedMessage.decode(buffer);
 
-		// console.log(feed.entity[0].tripUpdate); return;
-		// const trips = await new Promise(async (resolve, reject) => {
-		// 	while (!fs.existsSync(
-		// 		path.join(__dirname, '..', 'timetable', 'trips.txt')
-		// 	)) await new Promise(r => setTimeout(r, 1000));
+		// Filter updates to only those with vehicles in the route filters
+		tripUpdateCache = feed.entity.filter(entity => routeFilters.includes(entity.tripUpdate.trip.routeId || 0));
 
-		// 	fs.createReadStream(path.join(__dirname, '..', 'timetable', 'trips.txt'))
-		// 		.pipe(csv())
-		// 		.on('data', (data) => { trips.push(data); })
-		// 		.on('end', () => { resolve(trips); })
-		// 		.on('error', (error) => { reject(error); });
-		// })
+		// Set last updated time of cache.
+		lastUpdatedTime = new Date().toISOString();
 
-		const new_feed = feed.entity.filter(entity => routeFilters.includes(entity.tripUpdate.trip.routeId || 0));
+		// Nice little logging :)
+		console.log('Trip Update Cache Updated!\n');
 
-		console.log(new_feed, new_feed[0]); 
-
-		// console.log(feed.header.timestamp.low)
-		
-		// const vehicles = feed.entity
-		// 	// Filter for valid vehicle entities.
-		// 	.filter( entity => entity.vehicle )
-		// 	.map( entity => {
-		// 			const position = entity.vehicle.position;
-		// 			const trip = entity.vehicle.trip;
-
-		// 			const vehicle = {
-		// 				// Vehicle ID
-		// 				id: entity.id || 0,
-		// 				// Vehicle Latitude
-		// 				lat: position.latitude || 0,
-		// 				// Vehicle Longitude
-		// 				long: position.longitude || 0,
-		// 				// Vehicle Speed
-		// 				speed: position.speed || 0,
-		// 				// Vehicle Route ID
-		// 				routeID: trip.routeId || 0,
-		// 				// Vehicle Trip ID
-		// 				tripID: trip.tripId	|| 0, 
-		// 				// ADLM Bus ID 
-		// 				fleetNumber: entity.vehicle.vehicle.id || 0,
-		// 				// Something cool I've found is:
-		// 				// 3 digit fleetNumbers denote older model busses,
-		// 				// 4 digit 1000-1999 fleetNumbers are newer model busses,
-		// 				// (2000-4999 are trains...)
-		// 				// and 4 digit 5000-5999 represent electric busses.
-		// 				// location: gc.getAddressFromCoords(position.latitude, position.longitude) || 0
-		// 			}
-		// 			return vehicle
-		// 		}
-		// 	);
-		
-		// // Filter vehicles to only those in the route filters
-		// vehicleCache = vehicles.filter(vehicle => routeFilters.includes(vehicle.routeID));
-
-		// // Set last updated time of cache.
-		// lastUpdatedTime = new Date().toISOString();
-
-		// // Nice little logging :)
-		// console.log('Cache Updated!\n');
-
-		// // Send cache to all connected sockets
-		// sockets.forEach(socket => {
-		// 	socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache });
-		// });
+		// Send cache to all connected sockets
+		sockets.forEach(socket => {
+			socket.emit('tripUpdateCache', { lastUpdated: lastUpdatedTime, data: tripUpdateCache });
+		})
 	}
 	catch (err) {
 		// spooky
@@ -111,13 +59,13 @@ function initTripUpdateCache(rf) {
     // Set route filter variable from server.js
     routeFilters = rf;
 
-    // Loop to call updateVehicleCache every 14s
+    // Loop to call updateTripUpdateCache every 14s
     updateTripUpdateCache();
-    // setInterval(updateVehicleCache, 14000);
+    setInterval(updateTripUpdateCache, 14000);
 }
 
 module.exports = {
     initTripUpdateCache,
     tripUpdateCache: () => { return tripUpdateCache },
-    lastUpdatedTime: () => { return lastUpdatedTime }
+    lastUpdatedTimeTUC: () => { return lastUpdatedTime }
 }

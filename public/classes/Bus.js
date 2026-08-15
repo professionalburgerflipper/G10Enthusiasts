@@ -45,11 +45,10 @@ class Bus {
         this._speed.push(speed);
         this._allTimestamps.push(receivedTimestamp);
 
-        this._checkOld();
         this._removeStaleData();
     }
 
-    _checkOld() {
+    checkOld() {
         const now = new Date();
         const latestTimestamp = this._allTimestamps.at(-1);
 

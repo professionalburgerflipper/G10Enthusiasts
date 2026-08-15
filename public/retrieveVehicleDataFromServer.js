@@ -2,12 +2,15 @@ const cache = {
     vehicles: [],
     closestVehicle: null,
 	geoloc: null,
-	timetable: null
+	timetable: null,
+    tripUpdate: null
 }
 
 function cacheUpdate() {
     if (!cache.geoloc) return;
     if (!cache.vehicles) return;
+
+    for (const vehicle of cache.vehicles) vehicle.checkOld();
 
     const [closestVehicle, closestVehicleDist] = findClosestVehicle();
     if (closestVehicle === null) {

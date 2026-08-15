@@ -119,7 +119,7 @@ async function updateVehicleCache() {
 		lastUpdatedTime = new Date().toISOString();
 
 		// Nice little logging :)
-		console.log('Cache Updated!\n');
+		console.log('Vehicle Cache Updated!\n');
 
 		// Send cache to all connected sockets
 		sockets.forEach(socket => {
@@ -149,5 +149,5 @@ module.exports = {
     init,
     vehicleCache: () => { return vehicleCache },
 	// vehicleCache: () => { return [{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]; },
-    lastUpdatedTime: () => { return lastUpdatedTime }
+    lastUpdatedTimeVC: () => { return lastUpdatedTime }
 }
