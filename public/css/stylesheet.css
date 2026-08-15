@@ -52,7 +52,7 @@ body {
         width: 100dvw;
     }
     #header-container {
-        width: 1fr;
+        width: 100%;
         overflow-x: hidden;
     }
 }
