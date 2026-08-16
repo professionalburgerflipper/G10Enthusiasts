@@ -73,10 +73,10 @@ class Bus {
         if (vehicleIndex === -1) return;
 
         const durationSinceLast = now - new Date(latestTimestamp);
-        if (durationSinceLast > 1000 * 60 * 5) {    // if older than 5 minutes
-            this._mapController.unrenderVehicle();  // k
-            cache.vehicles.splice(vehicleIndex, 1); // ys
-        }                                           // period
+        if (durationSinceLast > 1000 * 60 * 5) {       // if older than 5 minutes
+            this._mapController.unrenderMapVehicle();  // k
+            cache.vehicles.splice(vehicleIndex, 1);    // ys
+        }                                              // period
     }
 
 
