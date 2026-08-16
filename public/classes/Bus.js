@@ -91,7 +91,8 @@ class Bus {
 		while (this._distTraveled.length > 10) this._distTraveled.shift();
     }
 
-    renderStops() {
+    async renderStops() {
+        while (!map) await new Promise(resolve => setTimeout(resolve, 100));
         const stops = this.stops;
         const route = this.route;
         stops.forEach(stop => renderStop(stop, route.route_color));

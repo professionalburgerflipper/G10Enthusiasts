@@ -46,6 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
     })
 
+    while (!maplibregl) await new Promise(resolve => setTimeout(resolve, 100));
+
     // Create the map
     map = new maplibregl.Map({
         container: 'map',
