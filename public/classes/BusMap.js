@@ -166,9 +166,10 @@ class BusMap {
             }]
         });
 
-        map.setLayoutProperty(`vehicle-${vehicle_id}`, 'icon-rotate', Number(bearing) != NaN ? Number(bearing) - map.getBearing() : 0);
+        try { map.setLayoutProperty(`vehicle-${vehicle_id}`, 'icon-rotate', Number(bearing) != NaN ? Number(bearing) - map.getBearing() : 0); }
+        catch { map.setLayoutProperty(`vehicle-${vehicle_id}`, 'icon-rotate', 0); }
         map.moveLayer(`vehicle-${vehicle_id}`);
 
-        if (map_mode == 1) fit();
+        if (map_mode === 1 && map_mode_delayed === 1) fit();
     }
 }

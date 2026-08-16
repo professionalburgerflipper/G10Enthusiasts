@@ -5,6 +5,7 @@ let bg_routes_added = false;
 let icons_added = false;
 
 let map_mode = 0;
+let map_mode_delayed = 0;
 let big_geojson;
 
 function fit() {
@@ -26,7 +27,8 @@ function fit() {
                 bearing: 86.8
             }); break;
     }
-    
+
+    setTimeout(() => map_mode_delayed = map_mode, 1000);
 }
 
 // Run on page load

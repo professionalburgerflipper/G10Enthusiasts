@@ -93,6 +93,6 @@ class Geoloc {
         });
 
         map.moveLayer("geoloc");
-        if (map_mode === 2) fit();
+        if (map_mode === 2 && map_mode_delayed === 2) fit();
     }
 }
