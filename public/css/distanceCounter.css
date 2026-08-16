@@ -57,7 +57,7 @@
 	padding: 0 2dvw;
 	padding-bottom: 0.3dvw;
 
-	transition: --Color 2s;
+	transition: --Color 2s, border 2s, color 2s;
 
 	border-radius: 10px;
 
@@ -164,7 +164,8 @@
 #boarded-status::after {
 	font-family: "dotMatrix";
 	content: var(--boarded-status);
-	color: var(--boarded-col, red) !important;
+	color: var(--boarded-col) !important;
+	transition: color 2s;
 }
 
 #next-stop {

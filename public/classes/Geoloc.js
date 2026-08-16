@@ -6,6 +6,8 @@ class Geoloc {
         this._speed = [speed];
         this._accuracy = [accuracy];
         this._timestamps = [timestamp];
+
+        this._instantiateMap();
     }
 
     get lat() { return this._lat; }
@@ -24,6 +26,7 @@ class Geoloc {
         this._timestamps.push(timestamp);
 
         this._removeStaleData();
+        this._renderPosition();
     }
 
     _removeStaleData() {
@@ -35,5 +38,61 @@ class Geoloc {
             this._accuracy.shift();
             this._timestamps.shift();
         }
+    }
+
+    async _instantiateMap() {
+        if (this._mapInstantiated) return;
+        while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+        while (!icons_added) await new Promise(resolve => setTimeout(resolve, 100));
+
+        const geojson = {
+            type: "FeatureCollection",
+            features: [{
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [Number(this._long.at(-1)), Number(this._lat.at(-1))]
+                },
+                properties: {}
+            }]
+        }
+
+        map.addSource("geoloc", {
+            type: "geojson",
+            data: geojson
+        });
+
+        map.addLayer({
+            id: "geoloc",
+            type: "symbol",
+            source: "geoloc",
+            layout: {
+                "icon-image": "user",
+                "icon-size": 0.025
+            }
+        });
+
+        map.moveLayer("geoloc");
+        this._mapInstantiated = true;
+    }
+
+    async _renderPosition() {
+        while (!this._mapInstantiated || false) await new Promise(resolve => setTimeout(resolve, 100));
+
+        const source = map.getSource("geoloc");
+        source.setData({
+            type: "FeatureCollection",
+            features: [{
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [Number(this._long.at(-1)), Number(this._lat.at(-1))]
+                },
+                properties: {}
+            }]
+        });
+
+        map.moveLayer("geoloc");
+        if (map_mode === 2) fit();
     }
 }

@@ -15,7 +15,10 @@ class Bus {
 		this._distTraveled = [];
 
         this.mapInterpolationTime = new Date();
-        instantiateMapVehicle(this);
+        // instantiateMapVehicle(this);
+        this._mapController = new BusMap(this);
+        this.mapLat = lat;
+        this.mapLon = long;
     }
 
     // Attribute Getters
@@ -29,6 +32,7 @@ class Bus {
     get shapeID() { return this._shapeID; }
     get fleetNumber() { return this._fleetNumber; }
     get timestamps() { return this._allTimestamps; }
+    get mapController() { return this._mapController; }
 
     // Relationship Getters
 	get shape() { return cache.timetable.shapes.filter(shape => shape.shape_id == this._shapeID); }
@@ -70,8 +74,8 @@ class Bus {
 
         const durationSinceLast = now - new Date(latestTimestamp);
         if (durationSinceLast > 1000 * 60 * 5) {    // if older than 5 minutes
-            unrenderVehicle(this);
-            cache.vehicles.splice(vehicleIndex, 1); // kys
+            this._mapController.unrenderVehicle();  // k
+            cache.vehicles.splice(vehicleIndex, 1); // ys
         }                                           // period
     }
 
@@ -91,10 +95,11 @@ class Bus {
         const stops = this.stops;
         const route = this.route;
         stops.forEach(stop => renderStop(stop, route.route_color));
+        cache.vehicles.forEach(b => map.moveLayer(`vehicle-${b.id}`))
     }
     unrenderStops() { this.stops.forEach(stop => unrenderStop(stop.stop_id)); }
 
-    async makeProminent() { return await makeProminent(this); }
-    async makeNotProminent() { return await makeNotProminent(this) }
+    async makeProminent() { return await this._mapController.makeProminent(); }
+    async makeNotProminent() { return await this._mapController.makeNotProminent() }
 
 }

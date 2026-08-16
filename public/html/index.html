@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="/css/distanceCounter.css">
 
 		<!-- Classes -->
+		<script src="/classes/BusMap.js" defer></script>
 		<script src="/classes/Bus.js" defer></script>
 		<script src="/classes/Geoloc.js" defer></script>
 
@@ -27,16 +28,10 @@
 		<script src="../getNextStop.js" defer></script>
 		<script src="../boardedStatus.js" defer></script>
 		<script src="../mapStuff.js" defer></script>
+
+		<!-- Icon Stuff -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=map,near_me,my_location" />
 	</head>
-
-	<!-- <script> // socket.emit('emit to server')
-		const socket = io();
-
-		socket.on('connect', () => {
-			console.log('Connected to server');
-		});
-
-	</script> -->
 
 	<body id="tempVehicleOutput">
 		<div id="meta-body-container">
@@ -59,6 +54,11 @@
 				<br>
 			</div>
 			<div id="map"></div>
+			<div id="map-buttons">
+				<button class="selected"><span class="material-symbols-outlined">map</span></button>
+				<button><span class="material-symbols-outlined">near_me</span></button>
+				<button><span class="material-symbols-outlined">my_location</span></button>
+			</div>
 			<div id="fade"></div>
 			<img src="../media/book.gif">
 		</div>

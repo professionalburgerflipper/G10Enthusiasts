@@ -52,6 +52,8 @@ body {
     translate: -50% 0;
 }
 
+#meta-body-container { anchor-scope: --map; }
+
 
 #map {
     width: 100dvw;
@@ -62,7 +64,43 @@ body {
     border-bottom-right-radius: 2rem;
     margin-top: -2rem;
     z-index: 1;
+    anchor-name: --map;
 }
+
+#map-buttons {
+    display: grid;
+    position: absolute;
+    position-anchor: --map;
+    left: anchor(left);
+    top: anchor(center);
+    translate: 0 -50%;
+    grid-template-columns: min-content;
+    grid-auto-rows: 1fr;
+    z-index: 5;
+
+    background-color: rgb(20, 20, 20);
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    padding: 1rem 0.5rem 1rem 0;
+    gap: 0.25rem;
+}
+
+#map-buttons > button {
+    border-radius: 0;
+    appearance: none;
+    border: none;
+    font-size: large;
+    background-color: rgb(20, 20, 20);
+    color: var(--BusOrange);
+    align-content: center;
+    padding: 0.25rem;
+    padding-bottom: 0.1rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    transition: color 0.4s, background-color 0.4s;
+}
+#map-buttons > button.selected { background-color: var(--BusOrange); color: white; }
+#map-buttons > button:not(.selected):hover { background-color: rgb(40, 40, 40); }
 
 #fade {
     width: 100dvw;
