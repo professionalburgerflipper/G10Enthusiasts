@@ -92,6 +92,9 @@ class Geoloc {
             }]
         });
 
+        try { map.setLayoutProperty('geoloc', 'icon-rotate', Number(this._heading.at(-1)) != NaN ? Number(this._heading.at(-1)) - map.getBearing() : 0); }
+        catch { map.setLayoutProperty('geoloc', 'icon-rotate', 0); }
+
         map.moveLayer("geoloc");
         if (map_mode === 2 && map_mode_delayed === 2) fit();
     }
