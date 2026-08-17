@@ -69,14 +69,16 @@ function updateDistanceCounter(route, distance, fleetNumber) {
 	// Replace counter with text when error handling / no vehicles operational
 	fleetNumCounter.textContent = isValid ? '' : fleetNumber;
 
+	const container = document.querySelector("#distance-container");
+
 	// Update colour of everything based on
 	// 1. Validity
 	// 2. Distance
 	// 3. Route
-	if (!isValid) counter.parentNode.style.setProperty('--Color', 'var(--ErrorRed)');
-	else if (distance <= 75) counter.parentNode.style.setProperty('--Color', 'var(--ValidatedGreen)');
-	else if (route == 'N10') counter.parentNode.style.setProperty('--Color', 'var(--NightBlue)');
-	else counter.parentNode.style.setProperty('--Color', 'var(--BusOrange)');
+	if (!isValid) container.style.setProperty('--Color', 'var(--ErrorRed)');
+	else if (boardStatus == `ON THE ${cache.mainRoute}!`) container.style.setProperty('--Color', 'var(--ValidatedGreen)');
+	else if (route == 'N10') container.style.setProperty('--Color', 'var(--NightBlue)');
+	else container.style.setProperty('--Color', 'var(--BusOrange)');
 
 	// Reset last updated time (to -1 since incrementation occurs before first update)
 	lastUpdatedTime = -1;

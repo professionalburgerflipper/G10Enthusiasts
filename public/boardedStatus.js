@@ -23,7 +23,8 @@ function updateBoardStatus(distance) {
 	if (boardStatus == "onboard") __onboardHandling(distance);
 	else __offboardHandling(distance);
 
-	const display = document.querySelector('#boarded-status')
+	const display = document.querySelector('#boarded-status');
+	const prism = document.querySelector("#prism");
 
 	let currentCol = offboardCol;
 	if (boardStatus == `Maybe on the ${cache.mainRoute}?`) currentCol = trackingCol;
@@ -31,6 +32,7 @@ function updateBoardStatus(distance) {
 
     display.style.setProperty('--boarded-status', `"${boardStatus}"`);
 	display.style.setProperty('--boarded-col', currentCol);
+	prism.style.setProperty('--rtX', boardStatus == `ON THE ${cache.mainRoute}!` ? "90deg" : "0deg");
 }
 
 function __offboardHandling(distance) {

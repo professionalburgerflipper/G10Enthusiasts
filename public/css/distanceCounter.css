@@ -50,35 +50,59 @@
 /* Main container */
 #distance-container {
 	--Color: var(--BusOrange);
-	display: grid;
-	grid-template-columns: min-content 1fr min-content;
-	grid-template-rows: 1;
-	gap: 1dvw;
-	padding: 0 2dvw;
-	padding-bottom: 0.3dvw;
-
+	anchor-name: --distance-container;
+	anchor-scope: --distance-container;
 	transition: --Color 2s, border 2s, color 2s;
-
-	border-radius: 10px;
-
-	position: relative;
-
-	border: 1px solid var(--Color);
-
-	background-color: #000000;
 	
+	border-radius: 10px;
+	background-color: #000000;
+	border: 1px solid var(--Color);
+	
+	position: relative;
 	width: 80%;
+	min-height: 1.1lh;
 	height: min-content;
 	margin-left: auto;
 	margin-right: auto;
 
 	font-family: 'dotMatrix';
-	/* font-size: 5em; */
 	font-size: 6dvw;
 	color: var(--Color);
 	text-wrap-mode: nowrap;
+}
+#distance-container p { margin: 0; }
 
-	anchor-scope: --route, --fleet;
+#prism {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	transform-style: preserve-3d;
+	transform: rotateX(var(--rtX, 0deg)) rotateY(var(--rtY, 0deg)) rotateZ(var(--rtZ, 0deg));
+
+	transition: transform 700ms ease;
+}
+
+.face {
+	position: absolute;
+	box-sizing: border-box;
+	backface-visibility: hidden;
+}
+
+.face.front {
+	display: grid;
+	grid-template-columns: min-content 1fr min-content;
+	gap: 1dvw;
+	width: calc(100% - 4dvw);
+	translate: 2dvw 0;
+	background-color: black;
+}
+.face.bottom { 
+	transform: rotateX(-90deg) translateY(.5lh); 
+	width: calc(100% - 4dvw); height: 1lh;
+	translate: 2dvw 0;
+	text-align: center;
+	background-color: black;
 }
 
 /* G10!!!! */
