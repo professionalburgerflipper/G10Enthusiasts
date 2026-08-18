@@ -32,46 +32,46 @@ function fit() {
 }
 
 // Run on page load
-document.addEventListener("DOMContentLoaded", async () => {
+// document.addEventListener("DOMContentLoaded", async () => {
 
-    document.querySelectorAll("#map-buttons > button").forEach((btn, idx) => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll("#map-buttons > button")
-            .forEach((btn) => btn.classList.remove("selected"));
+//     document.querySelectorAll("#map-buttons > button").forEach((btn, idx) => {
+//         btn.addEventListener("click", () => {
+//             document.querySelectorAll("#map-buttons > button")
+//             .forEach((btn) => btn.classList.remove("selected"));
 
-            btn.classList.add("selected");
-            map_mode = idx;
+//             btn.classList.add("selected");
+//             map_mode = idx;
             
-            fit();
-        })
-    })
+//             fit();
+//         })
+//     })
 
-    while (!maplibregl) await new Promise(resolve => setTimeout(resolve, 100));
+//     while (!maplibregl) await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Create the map
-    map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // style URL
-        center: [138.59735099075218, -34.920761823897166],
-        zoom: 9,
-        bearing: 86.8,
-        attributionControl: false,
-        interactive: false,
-    })
+//     // Create the map
+//     map = new maplibregl.Map({
+//         container: 'map',
+//         style: 'https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // style URL
+//         center: [138.59735099075218, -34.920761823897166],
+//         zoom: 9,
+//         bearing: 86.8,
+//         attributionControl: false,
+//         interactive: false,
+//     })
 
-    map.on('load', () => { doneLoading = true; });
+//     map.on('load', () => { doneLoading = true; });
 
-    while (!map) await new Promise(resolve => setTimeout(resolve, 100));
-    while (!doneLoading) await new Promise(resolve => setTimeout(resolve, 100));
+//     while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+//     while (!doneLoading) await new Promise(resolve => setTimeout(resolve, 100));
     
-    loadBackgroundRoutes();
+//     loadBackgroundRoutes();
 
-    const bus_response = await map.loadImage('/media/Bus Icon.png');
-    const user_response= await map.loadImage('/media/User Icon.png');
-    map.addImage("bus", bus_response.data);
-    map.addImage("user", user_response.data);
-    icons_added = true;
-});
+//     const bus_response = await map.loadImage('/media/Bus Icon.png');
+//     const user_response= await map.loadImage('/media/User Icon.png');
+//     map.addImage("bus", bus_response.data);
+//     map.addImage("user", user_response.data);
+//     icons_added = true;
+// });
 
 
 async function loadBackgroundRoutes() {

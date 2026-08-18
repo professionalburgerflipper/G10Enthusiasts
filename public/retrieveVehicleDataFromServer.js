@@ -61,7 +61,7 @@ function cacheUpdate() {
 
 	findClosestBusDistanceFromOrigin(bus, closestVehicle.shape);
     
-    updateBoardStatus(estDistance);
+    updateBoardStatus(estDistance, closestVehicle.speed.at(-1), cache.geoloc.accuracy.at(-1));
     // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
     updateDistanceCounter(closestVehicle.routeID, estDistance, closestVehicle.fleetNumber);
 
