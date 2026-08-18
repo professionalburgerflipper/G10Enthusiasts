@@ -197,6 +197,7 @@
 	color: var(--BusOrange);
 	margin-bottom: 155px;
 	margin-top: 1%;
+	margin-bottom: 3px;
 }
 
 #next-stop::after {
@@ -207,8 +208,30 @@
 
 @media only screen and (max-width: 768px) {
 	#distance-container {
-		margin-left: 7%;
+		height: min-content;
+		min-height: 6lh;
+		padding: 2%;
+		padding-bottom: 3%;
+	}
+	#prism {
+		height: min-content;
+	}
+	.face.front { 
+		gap:0px;
 		grid-template-columns: 1fr;
 		grid-template-rows: min-content, min-content, min-content;
+	}
+	#route {
+		align-items: center;
+		text-align: center;
+		margin-bottom: 4%;
+	}
+	#distance-counter {
+		height: 11dvh;
+		font-size: 10dvh;
+	}
+
+	#closest-fleet-number {
+		text-align:center;
 	}
 }
