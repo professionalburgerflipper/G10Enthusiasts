@@ -2,11 +2,15 @@
 let map;
 let doneLoading = false;
 let bg_routes_added = false;
-let icons_added = false;
 
 let map_mode = 0;
 let map_mode_delayed = 0;
 let big_geojson;
+let popup;
+
+const BusIcon = document.createElement("div");
+const UserIcon = document.createElement("div");
+const StopMarker = document.createElement("div");
 
 function fit() {
     switch (map_mode) {
@@ -16,8 +20,8 @@ function fit() {
             }, bearing: 86.8 }); break;
         case 1: // Closest Vehicle Mode
             map.flyTo({
-                center: [cache.closestVehicle.mapLon, cache.closestVehicle.mapLat],
-                zoom: 14,
+                center: [cache.closestVehicle.long.at(-1), cache.closestVehicle.lat.at(-1)],
+                zoom: 15,
                 bearing: 86.8
             }); break;
         case 2: // User Geoloc Mode
@@ -32,46 +36,45 @@ function fit() {
 }
 
 // Run on page load
-// document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-//     document.querySelectorAll("#map-buttons > button").forEach((btn, idx) => {
-//         btn.addEventListener("click", () => {
-//             document.querySelectorAll("#map-buttons > button")
-//             .forEach((btn) => btn.classList.remove("selected"));
+    for (const x of [BusIcon, UserIcon]) x.appendChild(document.createElement("div"));
+    BusIcon.children[0].style.backgroundImage = 'url("/media/Bus Icon.png")';
+    UserIcon.children[0].style.backgroundImage = 'url("/media/User Icon.png")';
+    StopMarker.className = 'stop-marker';
 
-//             btn.classList.add("selected");
-//             map_mode = idx;
+    document.querySelectorAll("#map-buttons > button").forEach((btn, idx) => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("#map-buttons > button")
+            .forEach((btn) => btn.classList.remove("selected"));
+
+            btn.classList.add("selected");
+            map_mode = idx;
             
-//             fit();
-//         })
-//     })
+            fit();
+        })
+    })
 
-//     while (!maplibregl) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!maplibregl) await new Promise(resolve => setTimeout(resolve, 100));
 
-//     // Create the map
-//     map = new maplibregl.Map({
-//         container: 'map',
-//         style: 'https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // style URL
-//         center: [138.59735099075218, -34.920761823897166],
-//         zoom: 9,
-//         bearing: 86.8,
-//         attributionControl: false,
-//         interactive: false,
-//     })
+    // Create the map
+    map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://tiles.basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // style URL
+        center: [138.59735099075218, -34.920761823897166],
+        zoom: 9,
+        bearing: 86.8,
+        attributionControl: false,
+        // interactive: false,
+    })
 
-//     map.on('load', () => { doneLoading = true; });
+    map.on('load', () => { doneLoading = true; });
 
-//     while (!map) await new Promise(resolve => setTimeout(resolve, 100));
-//     while (!doneLoading) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!map) await new Promise(resolve => setTimeout(resolve, 100));
+    while (!doneLoading) await new Promise(resolve => setTimeout(resolve, 100));
     
-//     loadBackgroundRoutes();
-
-//     const bus_response = await map.loadImage('/media/Bus Icon.png');
-//     const user_response= await map.loadImage('/media/User Icon.png');
-//     map.addImage("bus", bus_response.data);
-//     map.addImage("user", user_response.data);
-//     icons_added = true;
-// });
+    loadBackgroundRoutes();
+});
 
 
 async function loadBackgroundRoutes() {
@@ -150,57 +153,22 @@ async function loadBackgroundRoutes() {
     bg_routes_added = true;
 }
 
-
-
-
-
 async function renderStop(stop, route_color) {
     while (!map) await new Promise(resolve => setTimeout(resolve, 100));
     while (!bg_routes_added) await new Promise(resolve => setTimeout(resolve, 100));
     
-    const geojson = {
-        type: "FeatureCollection",
-        features: [{
-            type: "Feature",
-            geometry: {
-                type: "Point",
-                coordinates: [Number(stop.stop_lon), Number(stop.stop_lat)]
-            },
-            properties: {
-                color: `#${route_color}`,
-                name: stop.stop_name,
-                desc: stop.stop_desc,
-                code: stop.stop_code
-            }
-        }]
-    }
+    const markerElement = StopMarker.cloneNode(true);
+    markerElement.style.setProperty("--color", `#${route_color}`);
+    markerElement.dataset.stop_id = stop.stop_id;
 
-    map.addSource(`stop-${stop.stop_id}`, {
-        type: "geojson",
-        data: geojson
-    });
-
-    map.addLayer({
-        id: `stop-${stop.stop_id}`,
-        type: "circle",
-        source: `stop-${stop.stop_id}`,
-        paint: {
-            "circle-color": "#adadad",
-            "circle-radius": 3,
-            "circle-stroke-color": ["get", "color"],
-            "circle-stroke-width": 1
-        }
-    });
-
-    let popup;
-
-    map.on('click', `stop-${stop.stop_id}`, (e) => {
+    markerElement.addEventListener("click", e => {
+        if (e.target != markerElement) return;
         if (popup) popup.remove();
         const NS = getNextStopAtStop(stop);
         const NS_Trip = cache.timetable.trips.find(t => t.trip_id == NS[1]);
         console.log(NS_Trip);
         popup = new maplibregl.Popup({className: 'stop-popup', anchor: 'top'})
-            .setLngLat(e.lngLat)
+            .setLngLat([Number(stop.stop_lon), Number(stop.stop_lat)])
             .setHTML(`
                     <b>${stop.stop_name}</b><br>
                     <p>${stop.stop_desc}</p>
@@ -209,22 +177,21 @@ async function renderStop(stop, route_color) {
                 `)
             .setMaxWidth("min-content")
             .addTo(map);
-        
-    });
+    })
 
-    map.moveLayer(`stop-${stop.stop_id}`);
+    const marker = new maplibregl.Marker({ element: markerElement })
+        .setLngLat([Number(stop.stop_lon), Number(stop.stop_lat)])
+        .addTo(map);
+
 }
 
 function unrenderStop(stop_id) {
     if (!map) return;
-    if (map.getLayer(`stop-${stop_id}`)) {
-        map.removeLayer(`stop-${stop_id}`);
-        map.removeSource(`stop-${stop_id}`);
-    }
+    
+    const markerElement = document.querySelector(`[data-stop_id="${stop_id}"]`);
+    if (!markerElement) return;
+    markerElement.remove();
 }
-
-
-
 
 function vehicleMoveTo(vehicle, current, destination) {
     if (!map) return;
@@ -232,6 +199,13 @@ function vehicleMoveTo(vehicle, current, destination) {
         vehicle.mapController.vehicleSetTo(destination, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
         return;
     }
+    if (cache.closestVehicle.id === vehicle.id)
+        if (map_mode === 1 && map_mode_delayed === 1) fit();
+
+    console.log(
+        `%c[${new Date().toISOString()}] Moving vehicle ${vehicle.id} from ${current} to ${destination}`,
+        'background: #222; color: #bada55'
+    );
 
     const now = new Date();
     vehicle.mapInterpolationTime = now;
@@ -241,43 +215,56 @@ function vehicleMoveTo(vehicle, current, destination) {
     const initBearing = Number(vehicle.bearing.at(-2));
     const destBearing = Number(vehicle.bearing.at(-1));
 
-    const [, initDistance] = findBusDistanceFromOrigin([current[1], current[0]], shape);
-    const [, destDistance] = findBusDistanceFromOrigin([destination[1], destination[0]], shape);
-
-    const diffDistance = Math.abs(destDistance - initDistance);
-
-    const distPerIncrement = 0.001; // km
-    const totalTime = 14 * 1000; // ms
-
-    console.log(
-        `%c[${new Date().toISOString()}] Moving vehicle ${vehicle.id} from ${current} to ${destination} - ${diffDistance}km`,
-        'background: #222; color: #bada55'
-    );
-
-    const direction = initDistance > destDistance ? -1 : 1;
-    const startTime = Date.now();
-
     function _lerpAngle(a, b, t) {
         const diff = ((b - a + 180) % 360 + 360) % 360 - 180;
         return (a + diff * t + 360) % 360;
     }
 
+    const [, initDistance] = findBusDistanceFromOrigin([current[1], current[0]], shape);
+    const [, destDistance] = findBusDistanceFromOrigin([destination[1], destination[0]], shape);
+
+    const allPoints = [[current[0], current[1], initDistance]];
+    let curDist = initDistance;
+
+    while (true) {
+        const nextShapePoint = shape.find(s => Number(s.shape_dist_traveled) > curDist && Number(s.shape_dist_traveled) < destDistance);
+        if (!nextShapePoint) {
+            allPoints.push([destination[0], destination[1], destDistance]);
+            break;
+        }
+
+        allPoints.push([Number(nextShapePoint.shape_pt_lon), Number(nextShapePoint.shape_pt_lat), Number(nextShapePoint.shape_dist_traveled)]);
+        curDist = Number(nextShapePoint.shape_dist_traveled);
+    }
+
+    const totalTime = 13 * 1000; // ms
+    const startTime = new Date();
+
     function animate() {
         const elapsed = Date.now() - startTime;
-        const m = Math.min(elapsed / totalTime * diffDistance, diffDistance);
-        
-        const shapeDistance = initDistance + m * direction;
-        const currentBearing = _lerpAngle(initBearing, destBearing, m / diffDistance);
+        const elapsedPerc = elapsed / totalTime;
 
-        const [point_lat, point_lon] = findShapePointByDistTraveled(shapeDistance, shape);
-
-        vehicle.mapController.vehicleSetTo([point_lon, point_lat], currentBearing, now);
-
-        if (m < diffDistance) vehicle.mapInterpolationFrame = requestAnimationFrame(animate);
-        else {
-            vehicle.mapInterpolationFrame = null; 
+        if (elapsedPerc > 1) {
+            vehicle.mapInterpolationFrame = null;
             vehicle.mapController.vehicleSetTo(destination, destBearing, now);
+            return;
         }
+
+        const estDistance = allPoints[0][2] + (allPoints.at(-1)[2] - allPoints[0][2]) * elapsedPerc;
+        const nextPoint = allPoints.find(p => p[2] > estDistance) || allPoints.at(-1);
+        const prevPoint = allPoints[allPoints.indexOf(nextPoint) - 1] || allPoints[0];
+        const segmentDist = nextPoint[2] - prevPoint[2];
+        const segmentPerc = (estDistance - prevPoint[2]) / segmentDist;
+
+        const point_lat = prevPoint[1] + (nextPoint[1] - prevPoint[1]) * segmentPerc;
+        const point_lon = prevPoint[0] + (nextPoint[0] - prevPoint[0]) * segmentPerc;
+
+        const currentBearing = _lerpAngle(initBearing, destBearing, elapsedPerc);
+
+        try { vehicle.mapController.vehicleSetTo([point_lon, point_lat], initBearing, now); }
+        catch (e) { console.warn(e, vehicle.id, vehicle.fleetNumber); vehicle.mapInterpolationFrame = null; return; }
+
+        vehicle.mapInterpolationFrame = requestAnimationFrame(animate);
     }
 
     vehicle.mapInterpolationFrame = requestAnimationFrame(animate);

@@ -1,3 +1,11 @@
+const GEOLOC_CHILD_STYLE = {
+    width: '20px',
+    height: '20px',
+    backgroundSize: 'contain',
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center"
+}
+
 class Geoloc {
     constructor(lat, long, heading, speed, accuracy, timestamp) {
         this._lat = [lat];
@@ -43,59 +51,26 @@ class Geoloc {
     async _instantiateMap() {
         if (this._mapInstantiated) return;
         while (!map) await new Promise(resolve => setTimeout(resolve, 100));
-        while (!icons_added) await new Promise(resolve => setTimeout(resolve, 100));
+        
+        this._markerElement = UserIcon.cloneNode(true);
+        this._markerElement.style.zIndex = 25;
+        this._markerIconElement = this._markerElement.children[0];
+        Object.assign(this._markerIconElement.style, GEOLOC_CHILD_STYLE);
+        this._markerIconElement.style.rotate = `${this._heading.at(-1) - map.getBearing()}deg`;
 
-        const geojson = {
-            type: "FeatureCollection",
-            features: [{
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [Number(this._long.at(-1)), Number(this._lat.at(-1))]
-                },
-                properties: {}
-            }]
-        }
+        this._marker = new maplibregl.Marker({ element: this._markerElement })
+            .setLngLat([Number(this._long.at(-1)), Number(this._lat.at(-1))])
+            .addTo(map);
 
-        map.addSource("geoloc", {
-            type: "geojson",
-            data: geojson
-        });
-
-        map.addLayer({
-            id: "geoloc",
-            type: "symbol",
-            source: "geoloc",
-            layout: {
-                "icon-image": "user",
-                "icon-size": 0.025
-            }
-        });
-
-        map.moveLayer("geoloc");
         this._mapInstantiated = true;
     }
 
     async _renderPosition() {
         while (!this._mapInstantiated || false) await new Promise(resolve => setTimeout(resolve, 100));
 
-        const source = map.getSource("geoloc");
-        source.setData({
-            type: "FeatureCollection",
-            features: [{
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [Number(this._long.at(-1)), Number(this._lat.at(-1))]
-                },
-                properties: {}
-            }]
-        });
+        this._marker.setLngLat([Number(this._long.at(-1)), Number(this._lat.at(-1))]);
+        this._markerIconElement.style.rotate = `${this._heading.at(-1) - map.getBearing()}deg`;
 
-        try { map.setLayoutProperty('geoloc', 'icon-rotate', Number(this._heading.at(-1)) != NaN ? Number(this._heading.at(-1)) - map.getBearing() : 0); }
-        catch { map.setLayoutProperty('geoloc', 'icon-rotate', 0); }
-
-        map.moveLayer("geoloc");
         if (map_mode === 2 && map_mode_delayed === 2) fit();
     }
 }

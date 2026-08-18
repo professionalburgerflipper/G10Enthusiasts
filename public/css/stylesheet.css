@@ -112,7 +112,21 @@ body {
     box-shadow: 0px 0px 40px 50px rgba(0, 0, 0, 1);
 }
 
-.stop-popup, .vehicle-popup { text-wrap-mode: nowrap; color: rgb(200, 200, 200); font-family: 'Courier New', Courier, monospace; font-weight: bold;}
+.stop-marker {
+    width: 5px;
+    height: 5px;
+    background-color: rgb(200, 200, 200);
+    border-radius: 50%;
+    outline: 2px solid var(--color, red);
+}
+
+.stop-popup, .vehicle-popup { 
+    text-wrap-mode: nowrap; 
+    color: rgb(200, 200, 200); 
+    font-family: 'Courier New', Courier, monospace; 
+    font-weight: bold;
+    z-index: 30;
+}
 .stop-popup b, .vehicle-popup b { font-family: 'dotMatrix'; color: var(--BusOrange); font-size: large; }
 .stop-popup *, .vehicle-popup * { margin: 0; }
 .stop-popup .maplibregl-popup-close-button, .vehicle-popup .maplibregl-popup-close-button { display: none; }
@@ -121,6 +135,7 @@ body {
     border: 1px solid var(--BusOrange);
     box-shadow: 0 0 0.3rem var(--BusOrange);
     border-radius: 1rem;
+    z-index: 30;
 }
 .stop-popup .maplibregl-popup-tip, .vehicle-popup .maplibregl-popup-tip { border-bottom-color: var(--BusOrange) !important;  }
 .stop-popup i, .vehicle-popup i { font-size: x-small; opacity: .7 }

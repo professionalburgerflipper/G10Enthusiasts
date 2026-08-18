@@ -96,7 +96,6 @@ class Bus {
         const stops = this.stops;
         const route = this.route;
         stops.forEach(stop => renderStop(stop, route.route_color));
-        cache.vehicles.forEach(b => map.moveLayer(`vehicle-${b.id}`))
     }
     unrenderStops() { this.stops.forEach(stop => unrenderStop(stop.stop_id)); }
 
