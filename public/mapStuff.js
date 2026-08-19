@@ -272,7 +272,7 @@ function vehicleMoveTo(vehicle, current, destination) {
 
         const currentBearing = _lerpAngle(initBearing, destBearing, elapsedPerc);
 
-        try { vehicle.mapController.vehicleSetTo([point_lon, point_lat], initBearing, now); }
+        try { vehicle.mapController.vehicleSetTo([point_lon, point_lat], currentBearing, now); }
         catch (e) { console.warn(e, vehicle.id, vehicle.fleetNumber); vehicle.mapInterpolationFrame = null; return; }
 
         vehicle.mapInterpolationFrame = requestAnimationFrame(animate);
