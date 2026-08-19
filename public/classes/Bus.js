@@ -48,6 +48,9 @@ class Bus {
     get distTraveled() { return this._distTraveled.at(-1) || undefined; }
 	getDistTraveled(index = -1) { return this._distTraveled.at(index); }
 
+    setDistanceFromUser(distance) { this._distFromUser = distance; }
+    get distanceFromUser() { return this._distFromUser; }
+
     updatePositionalData(lat, long, speed, bearing, receivedTimestamp) {
         this._speed.push(speed);
         this._bearing.push(bearing);

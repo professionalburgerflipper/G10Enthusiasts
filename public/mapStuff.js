@@ -195,11 +195,22 @@ function unrenderStop(stop_id) {
 
 function vehicleMoveTo(vehicle, current, destination) {
     if (!map) return;
+
     if (current[0] === destination[0] && current[1] === destination[1]) {
         vehicle.mapController.vehicleSetTo(destination, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
         return;
     }
-    if (cache.closestVehicle.id === vehicle.id)
+
+    if (cache.vehicles.indexOf(vehicle) >= 3) { // limit to 3 vehicles (closest 3 to user)
+        console.log(
+            `%c[${new Date().toISOString()}] Skipping vehicle ${vehicle.id} (limit to 3 vehicles)`,
+            'background: #222; color: #da8155'
+        )
+        vehicle.mapController.vehicleSetTo(destination, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
+        return;
+    }
+
+    if (cache.closestVehicle.id === vehicle.id) // Re-fit map if closest vehicle and if map mode is set to that mode
         if (map_mode === 1 && map_mode_delayed === 1) fit();
 
     console.log(

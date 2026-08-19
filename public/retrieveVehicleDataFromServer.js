@@ -32,40 +32,45 @@ const cache = {
     }
 }
 
-function cacheUpdate() {
-    if (!cache.geoloc) return;
-    if (!cache.vehicles) return;
+async function cacheUpdate() {
+    try {
+        while (!cache.geoloc) await new Promise(resolve => setTimeout(resolve, 100));
+        while (!cache.vehicles) await new Promise(resolve => setTimeout(resolve, 100));
 
-    cache.mainRoute = `${cache.timetable?.routes[0]?.route_id || 'G10'}`
+        cache.mainRoute = `${cache.timetable?.routes[0]?.route_id || 'G10'}`
 
-    for (const vehicle of cache.vehicles) vehicle.checkOld();
+        for (const vehicle of cache.vehicles) vehicle.checkOld();
 
-    const [closestVehicle, closestVehicleDist] = findClosestVehicle();
-    if (closestVehicle === null) {
-        updateDistanceCounter(`${cache.mainRoute}?`, -1, "None");
+        const [closestVehicle, closestVehicleDist] = findClosestVehicle();
+        if (closestVehicle === null) {
+            updateDistanceCounter(`${cache.mainRoute}?`, -1, "None");
+            getNextStop();
+            return;
+        }
+
+        const geolocTimestamp = cache.geoloc.timestamps.at(-1);
+
+        const bus = [closestVehicle.lat.at(-1), closestVehicle.long.at(-1), closestVehicle.timestamps.at(-1)];
+        
+        let prevBus = null;
+        if (closestVehicle.timestamps.at(-2) !== undefined) {
+            prevBus = [closestVehicle.lat.at(-2), closestVehicle.long.at(-2), closestVehicle.timestamps.at(-2)];
+        }
+
+        const estPosition = estimatePosition(bus, prevBus, geolocTimestamp, closestVehicle.shape);
+        const estDistance = findDistanceBetweenPoints(estPosition[0], estPosition[1], cache.geoloc.lat.at(-1), cache.geoloc.long.at(-1));
+
+        findClosestBusDistanceFromOrigin(bus, closestVehicle.shape);
+        
+        updateBoardStatus(estDistance, closestVehicle.speed.at(-1), cache.geoloc.accuracy.at(-1));
+        // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
+        updateDistanceCounter(closestVehicle.routeID, estDistance, closestVehicle.fleetNumber);
+
         getNextStop();
-        return;
+    } catch (error) {
+        console.error(error);
+        updateDistanceCounter(`${cache.mainRoute}?`, -1, "Error");
     }
-
-	const geolocTimestamp = cache.geoloc.timestamps.at(-1);
-
-    const bus = [closestVehicle.lat.at(-1), closestVehicle.long.at(-1), closestVehicle.timestamps.at(-1)];
-    
-    let prevBus = null;
-    if (closestVehicle.timestamps.at(-2) !== undefined) {
-        prevBus = [closestVehicle.lat.at(-2), closestVehicle.long.at(-2), closestVehicle.timestamps.at(-2)];
-    }
-
-    const estPosition = estimatePosition(bus, prevBus, geolocTimestamp, closestVehicle.shape);
-    const estDistance = findDistanceBetweenPoints(estPosition[0], estPosition[1], cache.geoloc.lat.at(-1), cache.geoloc.long.at(-1));
-
-	findClosestBusDistanceFromOrigin(bus, closestVehicle.shape);
-    
-    updateBoardStatus(estDistance, closestVehicle.speed.at(-1), cache.geoloc.accuracy.at(-1));
-    // BusPosition, HistoricalBusPosition, UserTimestamp, Shape 
-    updateDistanceCounter(closestVehicle.routeID, estDistance, closestVehicle.fleetNumber);
-
-    getNextStop();
 }
 
 const socket = io();
@@ -115,13 +120,15 @@ function findClosestVehicle() {
         const [geoLat, geoLong] = [cache.geoloc.lat.at(-1), cache.geoloc.long.at(-1)];
 		const distance = findDistanceBetweenPoints(geoLat, geoLong, busLat, busLong);
 
+        bus.setDistanceFromUser(distance);
+
 		if (distance < closestVehicleDist) {
 			closestVehicle = bus; closestVehicleDist = distance;
 		}
 	}
 
-
     cache.closestVehicle = closestVehicle
+    cache.vehicles.sort((a, b) => a.distanceFromUser - b.distanceFromUser); // sort by distance from user in ascending order
 
     return [closestVehicle, closestVehicleDist]
 }
