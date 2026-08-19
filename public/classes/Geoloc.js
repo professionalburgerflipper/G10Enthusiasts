@@ -63,10 +63,13 @@ class Geoloc {
             .addTo(map);
 
         this._mapInstantiated = true;
+        this._lastMapRender = new Date();
     }
 
     async _renderPosition() {
         while (!this._mapInstantiated || false) await new Promise(resolve => setTimeout(resolve, 100));
+        if (new Date() - this._lastMapRender < 100) return; // Throttle to 10fps
+        this._lastMapRender = new Date();
 
         this._marker.setLngLat([Number(this._long.at(-1)), Number(this._lat.at(-1))]);
         this._markerIconElement.style.rotate = `${this._heading.at(-1) - map.getBearing()}deg`;
