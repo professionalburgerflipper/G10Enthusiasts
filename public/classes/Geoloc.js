@@ -68,7 +68,7 @@ class Geoloc {
 
     async _renderPosition() {
         while (!this._mapInstantiated || false) await new Promise(resolve => setTimeout(resolve, 100));
-        if (new Date() - this._lastMapRender < 100) return; // Throttle to 10fps
+        if (new Date() - this._lastMapRender < 1500) return; // Throttle to 1 frame per 1.5 seconds
         this._lastMapRender = new Date();
 
         this._marker.setLngLat([Number(this._long.at(-1)), Number(this._lat.at(-1))]);
