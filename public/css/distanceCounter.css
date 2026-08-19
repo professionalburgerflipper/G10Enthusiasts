@@ -197,14 +197,12 @@
 	color: var(--BusOrange);
 	margin-bottom: 155px;
 	margin-top: 1%;
-	margin-bottom: 3px;
 }
 
 #next-stop::after {
-	/* color:azure; */
 	font-family: "dotMatrix";
 	content: var(--next-stop);
-} /* ok that fixed it */
+}
 
 @media only screen and (max-width: 768px) {
 	#distance-container {
@@ -231,7 +229,7 @@
 		font-size: 10dvh;
 	}
 
-	#closest-fleet-number {
-		text-align:center;
-	}
+	#closest-fleet-number { text-align:center; }
+
+	#next-stop { margin-bottom: 3px; }
 }
