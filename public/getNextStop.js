@@ -9,20 +9,21 @@ function getNextStop() {
         const stop = cache.closestVehicle.stops;
         const stop_time = cache.closestVehicle.stop_times;
 
-        let closest_index = NaN;
+        let closest_stop_id = NaN;
         let closest_diff = Number.POSITIVE_INFINITY;
         for (let i = 0; i < stop_time.length; i++) {
             let [stop_h, stop_m, stop_s] = stop_time[i].arrival_time.split(":");
             let cleaned_stop_t = parseInt(stop_h, 10) * 3600 + parseInt(stop_m, 10) * 60 + parseInt(stop_s, 10);
             let diff = cleaned_stop_t - totalSeconds;
             if (diff < closest_diff && diff > 0) {
-                closest_index = i 
+                closest_stop_id = stop_time[i].stop_id
                 closest_diff = diff
             }
         }
 
         const view = document.querySelector('#next-stop')
-        if (closest_index !== NaN)  view.style.setProperty('--next-stop', `"${cache.closestVehicle.stops[closest_index].stop_name}"`);
+        const next_stop = cache.closestVehicle.stops.find(s => s.stop_id == closest_stop_id);
+        if (closest_index !== NaN)  view.style.setProperty('--next-stop', `"${next_stop.stop_name}"`);
         else view.style.setProperty('--next-stop', `"None"`);
         // document.querySelector('#next-stop::after').textContent = cache.closestVehicle.stops[closest_index].stop_name;
 
