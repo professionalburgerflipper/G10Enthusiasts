@@ -23,7 +23,7 @@ function getNextStop() {
 
         const view = document.querySelector('#next-stop')
         const next_stop = cache.closestVehicle.stops.find(s => s.stop_id == closest_stop_id);
-        if (closest_index !== NaN)  view.style.setProperty('--next-stop', `"${next_stop.stop_name}"`);
+        if (next_stop)  view.style.setProperty('--next-stop', `"${next_stop.stop_name}"`);
         else view.style.setProperty('--next-stop', `"None"`);
         // document.querySelector('#next-stop::after').textContent = cache.closestVehicle.stops[closest_index].stop_name;
 
