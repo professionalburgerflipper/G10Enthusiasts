@@ -3,8 +3,8 @@
 ## TODO
 - ~~SOCKETS!!~~
 	~~socket.io, client/server ver.~~
-- Map
-	maplibre gl js <- I made a lot of it work but I dislike the implementation
+- ~~Map~~
+	~~maplibre gl js~~
 - G10 boarding verification
 	new method: Interpolate and extrapolate position.
 	STILL NEED to figure out boarding verification state machine
@@ -15,7 +15,7 @@
 	~~- Fetch static routes and stops from GTFS (version handling as well)~~
 	- Fetch time delays if actually possible
 - Mobile styling
-	- tom this one's all yours :D   <-- might be an idea to finish computer styling 1st... but imma work on sizing
+	- tom this one's all yours :D   <-- might be an idea to finish computer styling 1st... but imma work on sizing <-- nahhhh
 	
 
 ## TODO LATER
