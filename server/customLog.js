@@ -56,9 +56,9 @@ const translations = {
  * @param {String} msg - The message to log
  */
 function log(msg) {
-    msg = `&e&l[${new Date().toISOString()}]&r ` + msg
-    for (const [key, value] in Object.entries(translations)) msg = msg.replaceAll(key, value);
-    console.log(msg);
+    let message = `&e&l[${(new Date()).toISOString()}]&r ` + msg
+    for (const [key, value] of Object.entries(translations)) message = message.replaceAll(key, value);
+    console.log(message);
 }
 
 module.exports = log
