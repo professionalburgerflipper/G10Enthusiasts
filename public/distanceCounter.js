@@ -32,19 +32,21 @@ function updateDistanceCounter(route, distance, fleetNumber) {
 	const routeCounter = document.querySelector("#route");
 
 	// Route count animation.
-	if (routeCounter.innerText != route && route !== null) const interval = setInterval(() => {
-		// Iterate through each character and replace with random letter
-		routeCounter.innerText = route.split("").map((letter, index) => {
-			// If we have reached the end of the route, stop
-			if (index < iterations) return route[index];
-			return letters[Math.floor(Math.random() * 26)];
-		}).join("");
-		
-		// Stop when we have iterated through the entire route
-		if (iterations >= route.length) clearInterval(interval);
-		// Else, increment the iteration counter
-		iterations += 1 / 3; 
-	}, 100);
+	if (routeCounter.innerText != route && route !== null) {
+		const interval = setInterval(() => {
+			// Iterate through each character and replace with random letter
+			routeCounter.innerText = route.split("").map((letter, index) => {
+				// If we have reached the end of the route, stop
+				if (index < iterations) return route[index];
+				return letters[Math.floor(Math.random() * 26)];
+			}).join("");
+			
+			// Stop when we have iterated through the entire route
+			if (iterations >= route.length) clearInterval(interval);
+			// Else, increment the iteration counter
+			iterations += 1 / 3; 
+		}, 100);
+	}
 
 	// Determine accurate distance
 	distance = Math.round(distance);
