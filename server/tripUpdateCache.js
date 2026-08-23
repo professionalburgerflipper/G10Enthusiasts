@@ -8,6 +8,7 @@ let tripUpdateCache = [];
 let lastUpdatedTime = null;
 
 // Global variables
+const log = require('./customLog.js');
 let sockets = require('./sockets');
 let routeFilters = [];
 
@@ -21,12 +22,12 @@ async function updateTripUpdateCache() {
 		// Realtime feed from ADLM GTFS. 
 		const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/trip_updates';
 
-		console.log(`[${new Date().toISOString()}] Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
+		log(`&bFetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
 		
 		// Fetch binary from ADLM.
 		const response = await fetch(gtfsURL_vehicle_position);
 		// Throw error if fetch failed.
-		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'\n`);
+		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'`);
 
 		// Convert response to binary buffer.
 		const arrayBuffer = await response.arrayBuffer();
@@ -42,17 +43,14 @@ async function updateTripUpdateCache() {
 		lastUpdatedTime = new Date().toISOString();
 
 		// Nice little logging :)
-		console.log('Trip Update Cache Updated!\n');
+		log('&bTrip Update Cache Updated!');
 
 		// Send cache to all connected sockets
 		sockets.forEach(socket => {
 			socket.emit('tripUpdateCache', { lastUpdated: lastUpdatedTime, data: tripUpdateCache });
 		})
 	}
-	catch (err) {
-		// spooky
-		console.error(err);
-	}
+	catch (err) { log(`&4Error fetching &bGTFS-RT&4: ${err}`); } // spooky
 }
 
 function initTripUpdateCache(rf) {

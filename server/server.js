@@ -27,6 +27,7 @@ const { initTimetableUpdater } = require('./timetableUpdater.js'); initTimetable
 const { initTripUpdateCache, tripUpdateCache, lastUpdatedTimeTUC } = require('./tripUpdateCache.js'); initTripUpdateCache(routeFilters);
 const { init, vehicleCache, lastUpdatedTimeVC } = require('./vehicleCache.js'); init(routeFilters);
 const retrieveTimetableComponents = require('./timetableRetriever.js');
+const log = require('./customLog.js');
 let sockets = require('./sockets.js');
 
 // Allow for accessing scripts via URL
@@ -48,7 +49,7 @@ io.on('connection', async (socket) => {
 	sockets.push(socket);
 
 	// Log connection to console
-	console.log(`[${new Date().toISOString()}] Client connected.`)
+	log(`&eClient connected.`)
 
 	// Send current vehicle cache
 	socket.emit('vehicleCache', { lastUpdated: lastUpdatedTimeVC(), data: vehicleCache() });
@@ -62,7 +63,7 @@ io.on('connection', async (socket) => {
 		sockets.splice(sockets.indexOf(socket), 1);
 
 		// Log disconnection
-		console.log(`[${new Date().toISOString()}] Client disconnected.`)
+		log(`&eClient disconnected.`)
 	});
 
 	// Send miscellaneous timetable data
@@ -71,4 +72,4 @@ io.on('connection', async (socket) => {
 })
 
 // Start server on desired port and log
-server.listen(PORT, () => console.log(`Localhost active; open http://localhost:${PORT}/ to view the ${routeFilters[0]} enthusiasts :)`));
+server.listen(PORT, () => log(`&eLocalhost active; open http://localhost:${PORT}/ to view the ${routeFilters[0]} enthusiasts :)`));

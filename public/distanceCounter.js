@@ -24,34 +24,27 @@ function updateDistanceCounter(route, distance, fleetNumber) {
 	const throbber = document.querySelector("#throbber");
 	throbber.style.opacity = 0;
 
+	// Characters to use for animation
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	let iterations = 0;
 
+	// Route counter element
 	const routeCounter = document.querySelector("#route");
 
 	// Route count animation.
-	if (routeCounter.innerText != route && route !== null) {
-		const interval = setInterval(
-			() => {
-				routeCounter.innerText = route
-					.split("")
-					.map(
-						(letter, index) => {
-							if (index < iterations) {
-								return route[index];
-							}
-							return letters[Math.floor(Math.random() * 26)];
-						}
-					).join("");
-				
-				if (iterations >= route.length) {
-					clearInterval(interval);
-				}
-				
-				iterations += 1 / 3; 
-			},
-		100);
-	}
+	if (routeCounter.innerText != route && route !== null) const interval = setInterval(() => {
+		// Iterate through each character and replace with random letter
+		routeCounter.innerText = route.split("").map((letter, index) => {
+			// If we have reached the end of the route, stop
+			if (index < iterations) return route[index];
+			return letters[Math.floor(Math.random() * 26)];
+		}).join("");
+		
+		// Stop when we have iterated through the entire route
+		if (iterations >= route.length) clearInterval(interval);
+		// Else, increment the iteration counter
+		iterations += 1 / 3; 
+	}, 100);
 
 	// Determine accurate distance
 	distance = Math.round(distance);
@@ -69,6 +62,7 @@ function updateDistanceCounter(route, distance, fleetNumber) {
 	// Replace counter with text when error handling / no vehicles operational
 	fleetNumCounter.textContent = isValid ? '' : fleetNumber;
 
+	// Update container
 	const container = document.querySelector("#distance-container");
 
 	// Update colour of everything based on
@@ -76,7 +70,7 @@ function updateDistanceCounter(route, distance, fleetNumber) {
 	// 2. Distance
 	// 3. Route
 	if (!isValid) container.style.setProperty('--Color', 'var(--ErrorRed)');
-	else if (boardStatus == `ON THE ${cache.mainRoute}!`) container.style.setProperty('--Color', 'var(--ValidatedGreen)');
+	else if (boardStatus == 'onboard') container.style.setProperty('--Color', 'var(--ValidatedGreen)');
 	else if (route == 'N10') container.style.setProperty('--Color', 'var(--NightBlue)');
 	else container.style.setProperty('--Color', 'var(--BusOrange)');
 

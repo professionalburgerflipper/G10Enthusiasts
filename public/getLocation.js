@@ -1,6 +1,13 @@
+/**
+ * Yeah so everything in this file is pretty self explanatory
+ * so im just not gonna document most shit
+ */
+
+// Allow for geolocation
 let watchId = null;
 let retryTimeoutId = null;  
 
+// Geolocation options
 const highAccOptions = {
     enableHighAccuracy: true, // Use GPS location instead of wifi if true.
     timeout: 5000, // Error out if geoloc takes more than n seconds to complete.
@@ -26,6 +33,7 @@ function startTracking(highAcc) {
 }
 
 function successCallback(position) {
+    // Assigns data to Geoloc class or initializes it if it doesn't exist
     if (cache.geoloc) cache.geoloc.updatePositionalData(
         position.coords.latitude,
         position.coords.longitude,

@@ -51,6 +51,7 @@ let vehicleCache = [];
 let lastUpdatedTime = null;
 
 // Global variables
+const log = require('./customLog.js');
 let sockets = require('./sockets');
 let routeFilters = [];
 
@@ -64,12 +65,12 @@ async function updateVehicleCache() {
 		// Realtime feed from ADLM GTFS. 
 		const gtfsURL_vehicle_position = 'https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions';
 
-		console.log(`[${new Date().toISOString()}] Fetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
+		log(`&aFetching GTFS-RT from ${gtfsURL_vehicle_position}...`);
 		
 		// Fetch binary from ADLM.
 		const response = await fetch(gtfsURL_vehicle_position);
 		// Throw error if fetch failed.
-		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'\n`);
+		if (!response.ok) throw new Error(`No response from ADLM at - '${gtfsURL_vehicle_position}'`);
 
 		// Convert response to binary buffer.
 		const arrayBuffer = await response.arrayBuffer();
@@ -77,8 +78,6 @@ async function updateVehicleCache() {
 
 		// Decode binary to object.
 		const feed = transit_realtime.FeedMessage.decode(buffer);
-
-		// console.log(feed.header.timestamp.low)
 		
 		const vehicles = feed.entity
 			// Filter for valid vehicle entities.
@@ -122,18 +121,12 @@ async function updateVehicleCache() {
 		lastUpdatedTime = new Date().toISOString();
 
 		// Nice little logging :)
-		console.log('Vehicle Cache Updated!\n');
+		log('&aVehicle Cache Updated!');
 
 		// Send cache to all connected sockets
-		sockets.forEach(socket => {
-			// socket.emit('vehicleCache', {"lastUpdated":lastUpdatedTime,"data":[{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]});
-			socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache })
-		});
+		sockets.forEach(socket => socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache }));
 	}
-	catch (err) {
-		// spooky
-		console.error(err);
-	}
+	catch (err) { log(`&4Error updating &avehicle cache&4: ${err}`) }
 }
 
 function init(rf) {
@@ -148,6 +141,5 @@ function init(rf) {
 module.exports = {
     init,
     vehicleCache: () => { return vehicleCache },
-	// vehicleCache: () => { return [{"id":"V11349061078","lat":-34.932979583740234,"long":138.59349060058594,"speed":7.300000190734863,"routeID":"G10","tripID":"1134906","fleetNumber":"1078"}]; },
     lastUpdatedTimeVC: () => { return lastUpdatedTime }
 }

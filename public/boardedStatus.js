@@ -50,19 +50,22 @@ function updateBoardStatus(distance, busSpeed, acc) {
 	if (boardStatus == `ON THE ${cache.mainRoute}!`) __onboardHandling(distance, radius); 
 	else __offboardHandling(distance, radius);
 
-	// HTML updates.
+	// Get HTML elements
 	const display = document.querySelector('#boarded-status');
 	const prism = document.querySelector("#prism");
 
+	// Set colour based on board status
 	let currentCol = offboardCol; 
 	if (boardStatus == "tracking") currentCol = trackingCol;
 	else if (boardStatus == "onboard") currentCol = onboardCol;
 
+	// Set text based on board status
 	let boardMsg = boardStatus
 	if (boardStatus == "offboard") boardMsg = `Not on the ${cache.mainRoute}.`
 	else if (boardStatus == "tracking") boardMsg = `Maybe on the ${cache.mainRoute}?`
 	else boardMsg = `ON THE ${cache.mainRoute}!`
 
+	// Update HTML accordingly
     display.style.setProperty('--boarded-status', `"${boardMsg}"`);
 	display.style.setProperty('--boarded-col', currentCol);
 	prism.style.setProperty('--rtX', boardStatus == "onboard" ? "90deg" : "0deg");
@@ -80,16 +83,20 @@ function __offboardHandling(distance, radius) {
 	// If the board score is 0, then return to offboard phase.
 	else boardStatus = "offboard";
 
+	// If the board score is above the threshold, transition to on board phase.
 	if (boardScore >= BOARDED_THRESHOLD) boardStatus = "onboard";
 }
 
 function __onboardHandling(distance, radius) {
-	if (distance < radius + GPS_ERROR_MARGIN && boardScore < BOARDED_MAX) {
-		boardScore += 1;
-	} else boardScore -= 2;
+	// If user is within threshold, add to score and transition to tracking phase.
+	if (distance < radius + GPS_ERROR_MARGIN && boardScore < BOARDED_MAX) boardScore += 1;
+	// Else, subtract from score
+	else boardScore -= 2;
 
+	// If the board score is below the threshold, transition to tracking phase
 	if (boardScore < BOARDED_THRESHOLD) boardStatus = "tracking";
 
+	// If the user is too far from the bus, return to offboard phase
 	if (distance >= radius + DISTANCE_STRIKE_THRESHOLD) {
 		boardStatus = "offboard";
 		boardScore = 0;

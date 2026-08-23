@@ -1,4 +1,17 @@
 /**
+ * no
+ * im not adding documentation for all ts
+ * no
+ */
+
+
+
+
+
+
+
+
+/**
  * 
  * @param {*} bus 
  * @param {*} prevBus 
