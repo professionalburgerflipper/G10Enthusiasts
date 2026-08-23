@@ -24,7 +24,7 @@ async function updateTimetableCache() {
 		
 		if (latestVersion == currentVersion) {
             is_first_checked = true;
-            console.log(`[${new Date().toISOString()}] Timetable is already up to date!`);
+            log(`&dTimetable is already up to date!`);
             return;
         }
 		log(`&dTimetable out of date, updating...`);
