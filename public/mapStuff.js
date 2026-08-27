@@ -184,28 +184,25 @@ async function renderStop(stop, route_color) {
     markerElement.style.setProperty("--color", `#${route_color}`);
     markerElement.dataset.stop_id = stop.stop_id;
 
-    // Add a click event that for some reason doesn't work
+    // Create popup for stop
+    const popup = new maplibregl.Popup({className: 'stop-popup', anchor: 'top'}).setMaxWidth("min-content")
+
+    // Update popup upon clicks
     markerElement.addEventListener("click", e => {
-        if (e.target != markerElement) return;
-        if (popup) popup.remove();
         const NS = getNextStopAtStop(stop);
         const NS_Trip = cache.timetable.trips.find(t => t.trip_id == NS[1]);
-        console.log(NS_Trip);
-        popup = new maplibregl.Popup({className: 'stop-popup', anchor: 'top'})
-            .setLngLat([Number(stop.stop_lon), Number(stop.stop_lat)])
-            .setHTML(`
-                    <b>${stop.stop_name}</b><br>
-                    <p>${stop.stop_desc}</p>
-                    <p>Next Arrival: ${NS[0].toLocaleTimeString()} to ${NS_Trip.trip_headsign}</p>
-                    <i>Stop ID: ${stop.stop_id}</i>
-                `)
-            .setMaxWidth("min-content")
-            .addTo(map);
+        popup.setHTML(`
+            <b>${stop.stop_name}</b><br>
+            <p>${stop.stop_desc}</p>
+            <p>Next Arrival: ${NS[0].toLocaleTimeString()} to ${NS_Trip.trip_headsign}</p>
+            <i>Stop ID: ${stop.stop_id}</i>
+        `)
     })
 
     // Create the marker and add it
     const marker = new maplibregl.Marker({ element: markerElement })
         .setLngLat([Number(stop.stop_lon), Number(stop.stop_lat)])
+        .setPopup(popup)
         .addTo(map);
 
 }

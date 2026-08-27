@@ -25,22 +25,17 @@ class BusMap {
 
         const route = this._vehicle.route;
 
-        this._markerIconElement.addEventListener("click", e => {
-            if (this._markerIconElement != e.target) return;
-            if (popup) popup.remove();
-            popup = new maplibregl.Popup({className: 'vehicle-popup', anchor: 'top'})
-                .setLngLat(this._marker.getLngLat())
-                .setHTML(`
-                        <b>${route.route_short_name} | Fleet #${this._vehicle.fleetNumber}</b><br>
-                        <p>${route.route_long_name}</p><br>
-                        <i>${this._vehicle.id}</i>
-                    `)
-                .setMaxWidth("min-content")
-                .addTo(map);
-        })
+        this._popup = new maplibregl.Popup({ className: 'vehicle-popup', anchor: 'top'})
+            .setHTML(`
+                <b>${route.route_short_name} | Fleet #${this._vehicle.fleetNumber}</b><br>
+                <p>${route.route_long_name}</p><br>
+                <i>${this._vehicle.id}</i>
+            `)
+            .setMaxWidth("min-content");
 
         this._marker = new maplibregl.Marker({ element: this._markerElement })
             .setLngLat([Number(this._vehicle.long.at(-1)), Number(this._vehicle.lat.at(-1))])
+            .setPopup(this._popup)
             .addTo(map);
     }
 

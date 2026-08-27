@@ -13,6 +13,8 @@ const fs = require('fs');		// Allow for file operations
 // Initialise server
 const app = express();
 app.use(cors());
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '..', 'public', 'html'));
 
 // Initialise socket connection
 const server = http.createServer(app);
@@ -28,6 +30,7 @@ const { initTripUpdateCache, tripUpdateCache, lastUpdatedTimeTUC } = require('./
 const { init, vehicleCache, lastUpdatedTimeVC } = require('./vehicleCache.js'); init(routeFilters);
 const retrieveTimetableComponents = require('./timetableRetriever.js');
 const log = require('./customLog.js');
+const sql = require('./database.js');
 let sockets = require('./sockets.js');
 
 // Allow for accessing scripts via URL
@@ -41,6 +44,13 @@ app.get('/', (req, res) => {
 		if (!fs.existsSync(path.join(__dirname, '..', p)))
 			return res.status(425).send('Still loading server dependencies on first load. Please try again in a minute.');
 	res.sendFile(path.join(__dirname, '..', 'public', 'html', "index.html")); //each ',' represents a slash basically in pth.join, and dirname takes the main directory
+})
+
+app.get('/history', async (req, res) => { 
+	const topEntries = await sql(`SELECT DISTINCT fleetNumber, startTimestamp, endTimestamp, routeID, tripID FROM tripHistory ORDER BY startTimestamp DESC, fleetNumber ASC LIMIT 50`);
+	const counts = await sql(`SELECT fleetNumber, COUNT(*) AS timesRan FROM tripHistory GROUP BY fleetNumber ORDER BY max(startTimestamp) DESC LIMIT 50`)
+	const merged = topEntries.map(te => ({...te, count: counts.find(c => c.fleetNumber == te.fleetNumber).timesRan}));
+	res.render('history', { topEntries: merged }); 
 })
 
 // Handle socket connections

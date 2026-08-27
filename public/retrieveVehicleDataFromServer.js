@@ -125,7 +125,7 @@ socket.on(
         }
         
         // Show debugging information in HTML DOM
-		document.getElementById("debug").innerHTML = cache.vehicle
+		document.getElementById("debug").innerHTML = JSON.stringify(data.data, null, 2);
 
         // Update the cache shit
         cacheUpdate()

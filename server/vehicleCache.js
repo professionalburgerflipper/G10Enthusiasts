@@ -52,6 +52,7 @@ let lastUpdatedTime = null;
 
 // Global variables
 const log = require('./customLog.js');
+const sql = require('./database.js');
 let sockets = require('./sockets');
 let routeFilters = [];
 
@@ -115,7 +116,13 @@ async function updateVehicleCache() {
 			);
 		
 		// Filter vehicles to only those in the route filters
-		vehicleCache = vehicles.filter(vehicle => routeFilters.includes(vehicle.routeID));
+		const filteredVehicles = vehicles.filter(vehicle => routeFilters.includes(vehicle.routeID))
+
+		// Check for new cache additions
+		updateTripHistory(filteredVehicles);
+
+		// Update the cache to match the incoming data
+		vehicleCache = filteredVehicles;
 
 		// Set last updated time of cache.
 		lastUpdatedTime = new Date().toISOString();
@@ -127,6 +134,22 @@ async function updateVehicleCache() {
 		sockets.forEach(socket => socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache }));
 	}
 	catch (err) { log(`&4Error updating &avehicle cache&4: ${err}`) }
+}
+
+async function updateTripHistory(cache) {
+	const currentRunning = await sql('SELECT * FROM "tripHistory" WHERE "endTimestamp" IS NULL');
+
+	// let newCache = cache.filter(c => !vehicleCache.map(v => v.id).includes(c.id));
+	// let oldCache = vehicleCache.filter(v => !cache.map(c => c.id).includes(v.id));
+
+	let newCache = cache.filter(c => !currentRunning.map(v => Number(v.fleetNumber)).includes(Number(c.fleetNumber)));
+	let oldCache = currentRunning.filter(v => !cache.map(c => Number(c.fleetNumber)).includes(Number(v.fleetNumber)));
+
+	if (newCache.length > 0) log(`&9Adding ${newCache.length} vehicles to trip history.`)
+	if (oldCache.length > 0) log(`&9Adding ${oldCache.length} end times to trip history.`)
+	
+	newCache.forEach(v => sql(`INSERT INTO "tripHistory" ("fleetNumber", "tripID", "routeID") VALUES (${Number(v.fleetNumber)}, ${Number(v.tripID)}, '${v.routeID}')`));
+	oldCache.forEach(v => sql(`UPDATE "tripHistory" SET "endTimestamp" = unixepoch() WHERE id = (SELECT id FROM "tripHistory" WHERE "fleetNumber" = ${Number(v.fleetNumber)} AND "tripID" = ${Number(v.tripID)} AND "routeID" = '${v.routeID}' AND "endTimestamp" IS NULL ORDER BY id DESC LIMIT 1)`));
 }
 
 function init(rf) {

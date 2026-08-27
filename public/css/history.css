@@ -1,0 +1,122 @@
+/* Bus font */
+@font-face {
+    font-family: 'dotMatrix';
+    src: url('../font/DOTMBold.TTF');
+}
+
+:root {
+    --BusOrange: #F2AF29;
+    --ErrorRed: #f22929;
+	--ValidatedGreen: #3dcb1d;
+	--NightBlue: #1f6a95;
+
+    --G10: #f1dc7c;
+    --G10Variant: #ebb078;
+    --FadedBusOrange: #F2AF29AA;
+}
+
+* { font-family: 'dotMatrix'; }
+
+html {
+    color-scheme: dark;
+	background-color: black;
+}
+
+b { color: var(--BusOrange); font-size: large; align-content: center; }
+
+#fleetNumberEntry, #fleetNumberEntryHeader {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr) 16ch;
+	grid-template-rows: 1fr;
+
+	background-color: black;
+	outline: 1px solid rgb(20, 20, 20);
+	min-height: 2.5lh;
+
+	align-content: center;
+
+    text-align: center;
+    text-wrap-mode: nowrap;
+}
+
+#fleetNumberEntry:hover {
+	background-color: rgb(5,5,10);
+}
+
+#fleetNumberEntryHeader {
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
+	background-color: rgb(5, 5, 10) !important;
+}
+
+#fleetNumberEntry > p {
+    margin: 0;
+    align-content: center;
+}
+
+#fleetNumberEntry:last-of-type {
+    border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+}
+
+#fleetNumberEntry > :nth-child(3) { font-size: x-large; }
+
+/* Permanent code */
+/* DO NOT DELETE! Page WILL NOT RUN without!! */
+h1 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    rotate: 45deg;
+    font-size: 7dvw;
+    text-wrap-mode: nowrap;
+    text-shadow: 0 0 10dvw var(--ErrorRed);
+    transition: rotate .2s;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.n10 { color: var(--NightBlue); }
+.g10 { color: var(--G10); }
+.g10a, .g10b, .g10c { color: var(--G10Variant); }
+
+#archives {
+    display: grid;
+    grid-template-columns: 0 1fr;
+    place-items: center;
+    place-content: center;
+    margin-bottom: -2.5lh;
+	position: relative;
+    pointer-events: none;
+}
+
+#archives > img {
+    width: 37dvw;
+    aspect-ratio: 400/256;
+}
+
+#archives > div {
+    width: 1px;
+    aspect-ratio: 1;
+    background-color: var(--BusOrange);
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    translate: calc(50dvw - 50%) -50%;
+    z-index: -2;
+    box-shadow: 
+        0 0 7dvw 8dvw rgba(255, 220, 170, 0.6),
+        0 0 8dvw 8dvw var(--FadedBusOrange);
+}
+
+
+
+@media only screen and (max-width: 768px) {
+    #archives > img { width: 75dvw; }
+    #archives > div {
+        box-shadow: 
+            0 0 15dvw 18dvw rgba(255, 220, 170, 0.6),
+            0 0 18dvw 18dvw var(--FadedBusOrange);
+    }
+}

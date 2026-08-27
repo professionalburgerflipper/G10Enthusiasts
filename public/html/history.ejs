@@ -1,0 +1,39 @@
+
+<head>
+	<link rel="stylesheet" href="/css/history.css">
+    <script>
+        setInterval(() => {
+            document.querySelector('h1').style.rotate = `${Number(document.querySelector('h1').style.rotate.replaceAll('"', '').replaceAll('deg', '')) + 360}deg`
+        }, 250);
+        document.addEventListener("DOMContentLoaded", () => { document.querySelector('h1').style.rotate = `405deg`; })
+    </script>
+</head>
+<h1>busses be near</h1>
+
+<!-- <pre><%= JSON.stringify(topEntries, null, 2) %></pre> -->
+<div onclick="window.location.href = '/';" title="Exit the archives...">back onclick="window.location.href = '/';"</div>
+<div id="archives">
+    <div></div>
+	<img src="../media/book.gif">
+</div>
+
+<div id="fleetNumberEntryHeader">
+    <b>Fleet Number</b>
+    <b>Last Seen</b>
+    <b>Route ID</b>
+    <b>Trip ID</b>
+    <b>Status</b>
+    <b>Times Ran</b>
+</div>
+
+<% topEntries.forEach(ent => { %>
+    <div id="fleetNumberEntry">
+        <p><%= ent.fleetNumber %></p>
+        <p><%= new Date(ent.startTimestamp * 1000).toLocaleString() %></p>
+		<p class="<%=ent.routeID%>"><%= ent.routeID %></p>
+		<p><%= ent.tripID %></p>
+        <% if (ent.endTimestamp) { %> <p id="entryStatus" style="text-shadow: 0 0 1dvw var(--ErrorRed);">FINISHED</p>
+        <% } else { %> <p id="entryStatus" style="text-shadow: 0 0 1dvw var(--ValidatedGreen);">RUNNING</p> <% } %>
+        <p><%= ent.count %></p>
+    </div>
+<% }); %>
