@@ -26,7 +26,7 @@ b { color: var(--BusOrange); font-size: large; align-content: center; }
 
 #fleetNumberEntry, #fleetNumberEntryHeader {
 	display: grid;
-	grid-template-columns: repeat(5, 1fr) 16ch;
+	grid-template-columns: 3ch repeat(5, 1fr) 16ch;
 	grid-template-rows: 1fr;
 
 	background-color: black;

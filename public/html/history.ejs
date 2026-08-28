@@ -18,6 +18,7 @@
 </div>
 
 <div id="fleetNumberEntryHeader">
+    <b>#</b>
     <b>Fleet Number</b>
     <b>Last Seen</b>
     <b>Route ID</b>
@@ -26,8 +27,9 @@
     <b>Times Ran</b>
 </div>
 
-<% topEntries.forEach(ent => { %>
+<% topEntries.forEach((ent, idx) => { %>
     <div id="fleetNumberEntry">
+        <p><%= idx %></p>
         <p><%= ent.fleetNumber %></p>
         <p><%= new Date(ent.startTimestamp * 1000).toLocaleString() %></p>
 		<p class="<%=ent.routeID%>"><%= ent.routeID %></p>
