@@ -147,9 +147,12 @@ async function updateTripHistory(cache) {
 
 	if (newCache.length > 0) log(`&9Adding ${newCache.length} vehicles to trip history.`)
 	if (oldCache.length > 0) log(`&9Adding ${oldCache.length} end times to trip history.`)
-	
-	newCache.forEach(v => sql(`INSERT INTO "tripHistory" ("fleetNumber", "tripID", "routeID") VALUES (${Number(v.fleetNumber)}, ${Number(v.tripID)}, '${v.routeID}')`));
-	oldCache.forEach(v => sql(`UPDATE "tripHistory" SET "endTimestamp" = unixepoch() WHERE id = (SELECT id FROM "tripHistory" WHERE "fleetNumber" = ${Number(v.fleetNumber)} AND "tripID" = ${Number(v.tripID)} AND "routeID" = '${v.routeID}' AND "endTimestamp" IS NULL ORDER BY id DESC LIMIT 1)`));
+
+	const newRows = newCache.map(v => `(${Number(v.fleetNumber)}, ${Number(v.tripID)}, '${v.routeID}')`);
+	sql(`INSERT INTO tripHistory (fleetNumber, tripID, routeID) VALUES ${newRows.join(', ')}`);
+
+	const oldRows = oldCache.map(v => `(SELECT id FROM tripHistory WHERE fleetNumber = ${Number(v.fleetNumber)} AND tripID = ${Number(v.tripID)} AND routeID = '${v.routeID}' ORDER BY id DESC LIMIT 1)`);
+	sql(`UPDATE tripHistory SET endTimestamp = unixepoch() WHERE id IN (${oldRows.join(', ')})`);
 }
 
 function init(rf) {
