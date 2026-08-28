@@ -47,7 +47,15 @@ app.get('/', (req, res) => {
 })
 
 app.get('/history', async (req, res) => { 
-	const topEntries = await sql(`SELECT DISTINCT fleetNumber, startTimestamp, endTimestamp, routeID, tripID FROM tripHistory ORDER BY startTimestamp DESC, fleetNumber ASC LIMIT 50`);
+	const topEntries = await sql(`
+		WITH MostRecentTimestamps AS (
+			SELECT fleetNumber, MAX(startTimestamp) AS time
+			FROM tripHistory GROUP BY fleetNumber
+		)
+		SELECT t.fleetNumber, t.startTimestamp, t.endTimestamp, t.routeID, t.tripID FROM tripHistory AS t 
+		JOIN MostRecentTimestamps AS mrt 
+		ON t.fleetNumber = mrt.fleetNumber AND t.startTimestamp = mrt.time
+		ORDER BY t.startTimestamp DESC LIMIT 50;`);
 	const counts = await sql(`SELECT fleetNumber, COUNT(*) AS timesRan FROM tripHistory GROUP BY fleetNumber ORDER BY max(startTimestamp) DESC LIMIT 50`)
 	const merged = topEntries.map(te => ({...te, count: counts.find(c => c.fleetNumber == te.fleetNumber).timesRan}));
 	res.render('history', { topEntries: merged }); 
