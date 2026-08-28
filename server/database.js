@@ -26,8 +26,8 @@ const client = new Database('g10enthu.db');
 
 async function runSQL(sql, params = []) {
     const row = client.prepare(sql);
-    if (sql.toLowerCase().includes('select')) return await row.all(params);
-    else return await row.run(params);
+    try { return await row.all(params); }
+    catch (e) { return await row.run(params); }
 }
 
 module.exports = runSQL;
