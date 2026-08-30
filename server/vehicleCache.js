@@ -119,28 +119,28 @@ async function updateVehicleCache() {
 		const filteredVehicles = vehicles.filter(vehicle => routeFilters.includes(vehicle.routeID))
 
 		// Check for new cache additions
-		updateTripHistory(filteredVehicles);
+		try { updateTripHistory(filteredVehicles); }
+		catch (err) { log(`&4Error updating &9vehicle cache&4: ${err}`) }
 
 		// Update the cache to match the incoming data
 		vehicleCache = filteredVehicles;
 
 		// Set last updated time of cache.
-		lastUpdatedTime = new Date().toISOString();
+		// lastUpdatedTime = new Date().toISOString();
+		lastUpdatedTime = Number(feed.header.timestamp) * 1000;
 
 		// Nice little logging :)
 		log('&aVehicle Cache Updated!');
 
 		// Send cache to all connected sockets
 		sockets.forEach(socket => socket.emit('vehicleCache', { lastUpdated: lastUpdatedTime, data: vehicleCache }));
+		return true;
 	}
 	catch (err) { log(`&4Error updating &avehicle cache&4: ${err}`) }
 }
 
 async function updateTripHistory(cache) {
 	const currentRunning = await sql('SELECT * FROM "tripHistory" WHERE "endTimestamp" IS NULL');
-
-	// let newCache = cache.filter(c => !vehicleCache.map(v => v.id).includes(c.id));
-	// let oldCache = vehicleCache.filter(v => !cache.map(c => c.id).includes(v.id));
 
 	let newCache = cache.filter(c => !currentRunning.map(v => Number(v.fleetNumber)).includes(Number(c.fleetNumber)));
 	let oldCache = currentRunning.filter(v => !cache.map(c => Number(c.fleetNumber)).includes(Number(v.fleetNumber)));
@@ -152,13 +152,25 @@ async function updateTripHistory(cache) {
 	oldCache.forEach(v => sql(`UPDATE "tripHistory" SET "endTimestamp" = unixepoch() WHERE id = (SELECT id FROM "tripHistory" WHERE "fleetNumber" = ${Number(v.fleetNumber)} AND "tripID" = ${Number(v.tripID)} AND "routeID" = '${v.routeID}' AND "endTimestamp" IS NULL ORDER BY id DESC LIMIT 1)`));
 }
 
-function init(rf) {
+async function init(rf) {
     // Set route filter variable from server.js
     routeFilters = rf;
 
-    // Loop to call updateVehicleCache every 14s
-    updateVehicleCache();
-    setInterval(updateVehicleCache, 14000);
+	async function _update() {
+		// Wait for cache to update
+		await updateVehicleCache();
+		
+		// Compute time until next update
+		const now = new Date();
+		const diff = (now.getTime() - lastUpdatedTime) % 16000;
+		log(`&aVehicle cache was last updated ${diff}ms ago, next update in ${16000 - diff}ms.`);
+
+		// Schedule next update (with a 1s buffer)
+		setTimeout(_update, 16000 - diff);
+	}
+
+	// Start first update
+	_update();
 }
 
 module.exports = {

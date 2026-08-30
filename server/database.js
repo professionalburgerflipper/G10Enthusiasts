@@ -30,6 +30,19 @@ async function runSQL(sql, params = []) {
     catch (e) { return await row.run(params); }
 }
 
+async function createDependencies() {
+    await runSQL(`
+        CREATE TABLE IF NOT EXISTS tripHistory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fleetNumber INTEGER NOT NULL,
+            tripID INTEGER NOT NULL,
+            routeID TEXT NOT NULL,
+            startTimestamp INTEGER NOT NULL DEFAULT (unixepoch()),
+            endTimestamp INTEGER
+        );`);
+}
+
+createDependencies();
 module.exports = runSQL;
 
 if (!module.parent) {

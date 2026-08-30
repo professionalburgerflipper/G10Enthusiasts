@@ -26,7 +26,7 @@ const routeFilters = ["G10", "G10A", "G10B", "G10C", "N10"];
 
 // Load G10 enthusiast modules
 const { initTimetableUpdater } = require('./timetableUpdater.js'); initTimetableUpdater(routeFilters);
-const { initTripUpdateCache, tripUpdateCache, lastUpdatedTimeTUC } = require('./tripUpdateCache.js'); initTripUpdateCache(routeFilters);
+// const { initTripUpdateCache, tripUpdateCache, lastUpdatedTimeTUC } = require('./tripUpdateCache.js'); initTripUpdateCache(routeFilters);
 const { init, vehicleCache, lastUpdatedTimeVC } = require('./vehicleCache.js'); init(routeFilters);
 const retrieveTimetableComponents = require('./timetableRetriever.js');
 const log = require('./customLog.js');
@@ -73,7 +73,7 @@ io.on('connection', async (socket) => {
 	socket.emit('vehicleCache', { lastUpdated: lastUpdatedTimeVC(), data: vehicleCache() });
 
 	// Send current trip update cache
-	socket.emit('tripUpdateCache', { lastUpdated: lastUpdatedTimeTUC(), data: tripUpdateCache() });
+	// socket.emit('tripUpdateCache', { lastUpdated: lastUpdatedTimeTUC(), data: tripUpdateCache() });
 
 	// Handle disconnections
 	socket.on('disconnect', () => {
