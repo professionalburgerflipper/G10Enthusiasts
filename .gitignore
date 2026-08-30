@@ -3,3 +3,4 @@ current_version.txt
 timetable/
 timetable_new/
 server/g10enthu.db
+sever/package-lock.json
