@@ -191,8 +191,8 @@ function findDistanceBetweenPoints(lat1, long1, lat2, long2) {
         throw new RangeError("Latitude must be between -90 and 90");
 
     // Numerical normalisation
-    lon1 = ((lon1 + 180) % 360 + 360) % 360 - 180;
-    lon2 = ((lon2 + 180) % 360 + 360) % 360 - 180;
+    long1 = ((lon1 + 180) % 360 + 360) % 360 - 180;
+    long2 = ((lon2 + 180) % 360 + 360) % 360 - 180;
 
     // Haversine formula
     const toRad = x => x * Math.PI / 180;
