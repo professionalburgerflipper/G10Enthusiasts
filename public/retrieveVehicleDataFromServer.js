@@ -180,6 +180,21 @@ function findClosestVehicle() {
  * @returns {Number} The distance between the two points
  */
 function findDistanceBetweenPoints(lat1, long1, lat2, long2) {
+    // Data validation
+    for (const arg of [lat1, long1, lat2, long2]) {
+        if (!Number.isFinite(arg)) 
+            throw new Error(`Invalid argument: ${arg}. All arguments of findDistanceBetweenPoints() method must be finite numbers.`);
+    }
+
+    // Numerical validation
+    if (lat1 < -90 || lat1 > 90 || lat2 < -90 || lat2 > 90)
+        throw new RangeError("Latitude must be between -90 and 90");
+
+    // Numerical normalisation
+    lon1 = ((lon1 + 180) % 360 + 360) % 360 - 180;
+    lon2 = ((lon2 + 180) % 360 + 360) % 360 - 180;
+
+    // Haversine formula
     const toRad = x => x * Math.PI / 180;
     const R = 6371000; // earth radius in meters
     const φ1 = toRad(lat1);
