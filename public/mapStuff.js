@@ -222,7 +222,7 @@ function vehicleMoveTo(vehicle, current, destination) {
     if (!map) return;
 
     //! Temporary for Seaford Line purposes
-    vehicle.mapController.vehicleSetTo([vehicle.long.at(-1), vehicle.lat.at(-1)], vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
+    vehicle.mapController.vehicleSetTo(current, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
     return;
 
     // Return if the vehicle is already at the destination
