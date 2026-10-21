@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         zoom: 9,
         bearing: 86.8,
         attributionControl: false,
-        //interactive: false,
+        interactive: false,
     })
 
     // Wait for the map to load
