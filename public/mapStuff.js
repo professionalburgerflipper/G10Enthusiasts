@@ -221,10 +221,6 @@ function vehicleMoveTo(vehicle, current, destination) {
     // Return if map doesn't exist
     if (!map) return;
 
-    //! Temporary for Seaford Line purposes
-    vehicle.mapController.vehicleSetTo(current, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
-    return;
-
     // Return if the vehicle is already at the destination
     if (current[0] === destination[0] && current[1] === destination[1]) {
         vehicle.mapController.vehicleSetTo(destination, vehicle.bearing.at(-1), vehicle.mapInterpolationTime);
